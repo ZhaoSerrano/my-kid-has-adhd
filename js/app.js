@@ -310,6 +310,8 @@ function grown(){
       <div class="letters" id="letters">${ALPHA.map(l=>`<button data-l="${l}" class="${P.letters.includes(l)?'on':''}" aria-pressed="${P.letters.includes(l)}">${l}</button>`).join('')}</div></div>
     <div class="panel"><h2>Counting range</h2><div class="seg" id="seg">${[10,20].map(n=>`<button data-n="${n}" class="${P.maxCount===n?'on':''}">Up to ${n}</button>`).join('')}</div>
       <p class="small">Kindergarten builds to 20 by spring. Start at 10.</p></div>
+    <div class="panel"><h2>Light or dark</h2><div class="seg" id="look">${[['auto','Auto'],['light','☀️ Light'],['dark','🌙 Dark']].map(([k,t])=>`<button data-a="${k}" class="${appearance()===k?'on':''}" aria-pressed="${appearance()===k}">${t}</button>`).join('')}</div>
+      <p class="small">Auto follows this device's setting. The choice is saved on this device for every child.</p></div>
     <div class="panel"><h2>Voice</h2>
       <label class="switch"><input type="checkbox" id="nvOn" ${pref.natural?'checked':''}><span><b>Natural voice</b> <span class="tag">beta</span></span></label>
       <p class="small">A free, open-source AI voice that sounds much more like a person. It downloads once (about 100 MB, so use Wi-Fi), then runs on this device. The words it reads never leave the device. English only.</p>
@@ -335,6 +337,8 @@ function grown(){
   $('#letters').querySelectorAll('button').forEach(b=>b.onclick=()=>{const l=b.dataset.l,on=P.letters.includes(l);
     if(on&&P.letters.length===1)return;P.letters=on?P.letters.filter(x=>x!==l):[...P.letters,l];b.classList.toggle('on',!on);b.setAttribute('aria-pressed',!on);saveP()});
   $('#seg').querySelectorAll('button').forEach(b=>b.onclick=()=>{P.maxCount=+b.dataset.n;saveP();$('#seg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
+  $('#look').querySelectorAll('button').forEach(b=>b.onclick=()=>{setAppearance(b.dataset.a);
+    $('#look').querySelectorAll('button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',x===b)})});
   fillVoiceSel($('#voiceSel'));
   $('#voiceSel').onchange=e=>{pref.name=e.target.value;voice=voices.find(v=>v.name===pref.name)||voice;savePref();testV()};
   const r=$('#rate');r.value=pref.rate;$('#rateVal').textContent=pref.rate.toFixed(2)+'×';

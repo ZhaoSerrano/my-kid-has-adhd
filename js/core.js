@@ -39,6 +39,10 @@ const kidName=()=>P&&P.meta.name||'';
 function record(id,ok,star=ok){
   if(id){const a=P.skills[id]||(P.skills[id]=[]);a.push(ok?1:0);if(a.length>10)a.shift()}
   if(star)P.stars++;saveP();updStars()}
+/* Light or dark: 'auto' follows the device. Saved as mkha_appearance; index.html applies it before the page draws. */
+const appearance=()=>{const a=store.get('mkha_appearance','auto');return a==='light'||a==='dark'?a:'auto'};
+function setAppearance(a){if(a==='light'||a==='dark'){document.documentElement.dataset.theme=a;store.set('mkha_appearance',a)}
+  else{delete document.documentElement.dataset.theme;store.del('mkha_appearance')}}
 /* Item-level boxes (spaced practice). 1 = missed, practice soon; 2 = right once; 3 = known, show rarely. */
 const itemId=q=>q.item===null?null:q.skill+':'+(q.item||q.key);
 const itemBox=q=>{const id=itemId(q),it=id&&P.items[id];return it?it.b:0};

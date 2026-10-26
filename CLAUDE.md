@@ -54,6 +54,7 @@ Optional question fields: `whyText` (screen text when it differs from the spoken
 - `lab_<profileId>` holds the profile's progress (`stars`, `skills{id:[1,0,…last 10]}`, `items{skill:item:{b,l}}`, `letters`, `maxCount`, `robotLevel`). Old `lab_*` keys with no `mkha_profiles` are migrated to profiles on first start.
 - `mkha_units` = parent-added units (schema below, plus `id` and optional `for` = profile id). `mkha_hidden` = hidden unit ids (the built-in example can be hidden, not deleted).
 - `u3voice` holds voice preferences (`name`, `rate`, `natural`, `nvoice`).
+- `mkha_appearance` = `"light"` or `"dark"` (JSON-encoded; absent = Auto, follows the device). A small inline script in `index.html` sets `data-theme` on `<html>` before the page draws.
 - Natural voice: generated lines are saved in IndexedDB `mkha-voice` (store `clips`, Int16 audio, key `voice|rate|text`); `mkha_nv_keys` lists them oldest first (newest 800 kept). `mkha_nv_trying` is set while the model loads, so a crash during loading (an older iPad out of memory) doesn't auto-retry on the next start.
 
 ### Natural voice (optional, in `js/core.js`)

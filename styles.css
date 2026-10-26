@@ -28,6 +28,7 @@ img{max-width:100%}
   --tile-s:30%; --tile-l:21%; --btn-l:64%;
   --c1:#F06A5F; --c2:#5E98F0; --c3:#F5C730; --c4:#45BC82; color-scheme:dark}
 
+:root[data-theme="light"]{color-scheme:light}
 html,body{height:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-tap-highlight-color:transparent}
