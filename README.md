@@ -2,7 +2,7 @@
 
 **Turn quiz prep into a game. Free, tap-to-answer practice built from your kid's actual study guide. Designed for kids with ADHD.**
 
-👉 **Open the app:** https://wiggleandwin.com/ (or type **mykidhasadhd.com**, which goes to the same place)
+👉 **Open the app:** https://wiggleandwin.com/
 
 Inside the app, your child sees **Wiggle & Win™**, a name that's all about play and never mentions ADHD.
 
