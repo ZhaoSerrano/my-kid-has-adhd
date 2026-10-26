@@ -50,6 +50,10 @@ Each skill has `std` (currently Indiana) and `cc` (Common Core for reading, writ
 
 Write it in the unit JSON schema (see `PROMPT.md`) and add it next to `EXAMPLE_UNIT` in `js/units.js`. Most families should add tests in the app instead.
 
+## Versions and "What's new"
+
+Every release gets a version number (shown on the grown-up screen) and a plain-language entry in [CHANGELOG.md](CHANGELOG.md), written so parents can read it. In your pull request, add a line under a new "Unreleased" heading at the top of the changelog; the maintainer assigns the version when releasing.
+
 ## Before you open a pull request
 
 There's no test framework. In the browser console:

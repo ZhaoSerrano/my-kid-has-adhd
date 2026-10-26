@@ -64,6 +64,14 @@ Optional question fields: `whyText` (screen text when it differs from the spoken
 - `mkha_appearance` = `"light"` or `"dark"` (JSON-encoded; absent = Auto, follows the device). A small inline script in `index.html` sets `data-theme` on `<html>` before the page draws.
 - Natural voice: generated lines are saved in IndexedDB `mkha-voice` (store `clips`, Int16 audio, key `voice|rate|text`); `mkha_nv_keys` lists them oldest first (newest 800 kept). `mkha_nv_trying` is set while the model loads, so a crash during loading (an older iPad out of memory) doesn't auto-retry on the next start.
 
+### Releases (every push is a version)
+The founder asked for clear version control on every push. For each push:
+1. Bump `APP_VERSION` in `js/app.js` (2.0.0 = big change in how the app works, 1.2.0 = new feature, 1.0.1 = small fix).
+2. Add a plain-language entry at the top of `CHANGELOG.md` (parents read it; it's linked from the grown-up screen as "What's new").
+3. Commit, then `git tag -a vX.Y.Z -m "<one-line summary>"`.
+4. Push with `git push --follow-tags`, then `~/.local/bin/gh release create vX.Y.Z --title "vX.Y.Z — <name>" --notes "<that CHANGELOG entry>"`.
+The founder's GitHub login works in her Terminal tabs (not in Claude's sandboxed shell), so run pushes there.
+
 ### Guided path (`js/path.js`, added Oct 26, 2026)
 - Home is **Today's Adventure**: 3 stops a day (Warm-up = missed/weak skills for spaced retrieval; Test practice if a test is coming, else Practice; Something new = next untried skill in `PATH_ORDER`). One big Play button; subjects live under "Choose a game" (`pickGame`). State: `P.today`, stickers in `P.stickers`.
 - End of a round: big button = next stop / "Try something new"; "Play again" is small. End of the day: recap ("Today you practiced…") + a theme sticker + "See you tomorrow".

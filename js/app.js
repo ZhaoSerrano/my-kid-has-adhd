@@ -334,6 +334,8 @@ const caseLabel=l=>P.lcase==='upper'?l.toUpperCase():P.lcase==='lower'?l:l.toUpp
 // Links for grown-ups only (never on kid screens). They open in a new tab so the app stays put.
 const REPO_URL='https://github.com/ZhaoSerrano/my-kid-has-adhd',GUIDE_URL=REPO_URL+'#use-it-in-3-steps',TEST_GUIDE_URL=REPO_URL+'#add-your-kids-test-in-3-steps';
 const FEEDBACK_URL=REPO_URL+'/issues/new?template=parent-feedback.yml';
+// Bump with every push, together with a CHANGELOG.md entry and a git tag (see CLAUDE.md → Releases).
+const APP_VERSION='2.0.0',CHANGELOG_URL=REPO_URL+'/blob/main/CHANGELOG.md';
 const extLink=(url,text)=>`<a href="${url}" target="_blank" rel="noopener">${text}</a>`;
 function twoTap(btn,msg,fn){let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent=msg;return}fn()}}
 function grown(){
@@ -390,6 +392,7 @@ function grown(){
       <p class="small">Opens a short form on GitHub (a free account is needed). The form is public, so leave out your child's name and other private details.</p></div>
     <p class="small"><b>Privacy:</b> names, progress and tests are saved only in this browser on this device. Nothing is sent anywhere. Wiggle &amp; Win™ (My Kid Has ADHD™: Quiz Prep) is designed for kids with ADHD; it is practice, not a treatment.</p>
     <button class="secondary" id="reset" style="align-self:center">Reset ${esc(kidLabel(me,idx))}'s progress</button>
+    <p class="small" style="text-align:center">Version ${APP_VERSION} · ${extLink(CHANGELOG_URL,"What's new")}</p>
   </div>`;
   $('#kidName').onchange=e=>{me.name=e.target.value.trim().slice(0,30);saveProfiles()};
   $('#themeRow').querySelectorAll('button').forEach(b=>b.onclick=()=>{me.theme=b.dataset.t;saveProfiles();
