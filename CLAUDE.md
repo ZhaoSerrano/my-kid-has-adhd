@@ -72,8 +72,12 @@ The founder asked for clear version control on every push. For each push:
 4. Push with `git push --follow-tags`, then `~/.local/bin/gh release create vX.Y.Z --title "vX.Y.Z — <name>" --notes "<that CHANGELOG entry>"`.
 The founder's GitHub login works in her Terminal tabs (not in Claude's sandboxed shell), so run pushes there.
 
-### Guided path (`js/path.js`, added Oct 26, 2026)
-- Home is **Today's Adventure**: 3 stops a day (Warm-up = missed/weak skills for spaced retrieval; Test practice if a test is coming, else Practice; Something new = next untried skill in `PATH_ORDER`). One big Play button; subjects live under "Choose a game" (`pickGame`). State: `P.today`, stickers in `P.stickers`.
+### Two modes, one goal at a time (`js/path.js`, Oct 26, 2026)
+The founder's rule: **if there's a test, focus only on the test.** Otherwise kids work through the whole school year. Never mix the two on the home screen.
+- **🎯 Test prep** (`focusUnit()` returns a unit): a user test within `TEST_WINDOW` (14) days, or a user test with no date. The built-in example never triggers it on Auto. All 3 stops use the test: Warm-up (test sections with misses, then weakest), Practice (weakest section), Mini test (6 from `unitTest`; the full test when ≤1 day left). Home shows the countdown and the `readiness(u)` meter (per section: items with box ≥ 2, or skill mastery).
+- **📚 School year**: Warm-up (missed/weak skills), Practice (weakest), Something new (next untried in `PATH_ORDER`). "My school year" (`pickGame`) shows per-subject mastery bars.
+- Grown-up override: `P.focus` = 'auto' | 'test' (on; `P.focusId` = chosen test) | 'year' (off). After a test date passes, grown-ups are asked how it went: `P.testResults[unitId] = {r:'great'|'ok'|'hard', at}`, which ends test prep for that test.
+- State: `P.today` = {date, mode, unit, stops, i, did}, rebuilt when the day, mode or test changes. Stickers in `P.stickers`.
 - End of a round: big button = next stop / "Try something new"; "Play again" is small. End of the day: recap ("Today you practiced…") + a theme sticker + "See you tomorrow".
 - Based on: Khan Academy Kids (one Play button into a path), Duolingo ABC (linear path), ADHD guidance (one step at a time, immediate rewards), spaced-retrieval research, Reading Eggs/Bitsboard end-of-session rewards.
 

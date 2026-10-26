@@ -48,32 +48,45 @@ function picker(){
   $('#addKid').onclick=welcome;
 }
 
-/* Home is Today's Adventure: 3 stops and one big Play button. Everything else is one level down. */
+/* Home shows one goal at a time: 🎯 Test prep when a test is coming, otherwise 📚 the school year.
+   Either way: 3 stops and one big Play button. Everything else is one level down. */
 function home(){
   const nm=kidName();setHeader(nm?`${nm}'s Wiggle & Win`:'Wiggle & Win',PROFILES.length>1?picker:null);
-  const T=today(),fin=T.i>=T.stops.length,hero=theme().hero,stk=P.stickers||[];
+  const T=today(),test=T.mode==='test',u=test&&allUnits().find(x=>x.id===T.unit),fin=T.i>=T.stops.length,hero=theme().hero,stk=P.stickers||[];
   const trail=T.stops.map((s,k)=>`<li class="stop ${k<T.i?'done':k===T.i?'now':''}">${k===T.i?`<span class="me" aria-hidden="true">${hero[0]}</span>`:''}
     <span class="bub">${k<T.i?'✓':s.pic}</span><b>${esc(s.title)}</b><small>${esc(stopLabel(s))}</small></li>`).join('');
+  const rd=test&&readiness(u),d=test&&daysUntil(u.testDate);
+  const meter=test?`<div class="ready"><div class="readytop"><b>Ready for the test</b><span>${rd.pct}%</span></div><div class="bar"><i style="width:${rd.pct}%"></i></div>
+    <ul>${rd.rows.map(r=>`<li><span>${r.pic}</span>${esc(r.title)}<em>${r.skill?(r.pct>=1?'✓ Got it':r.pct>0?'Getting there':'Not yet'):`${r.ready}/${r.total}`}</em></li>`).join('')}</ul></div>`:'';
+  const pend=resultPending().length;
   view.innerHTML=`<div class="col">
-    <section class="adventure"><h2>${fin?'Adventure done! 🎉':"Today's adventure"}</h2><ol class="trail">${trail}</ol>
-      ${fin?'<p class="sub">Come back tomorrow for a new one.</p>':''}
-      <button class="playbig" id="play">${fin?'🎨 Choose a game':`▶ Play`}</button></section>
-    ${fin?'':'<button class="secondary pick" id="pick">🎨 Choose a game</button>'}
+    <div class="modechip ${test?'test':'year'}">${test?'🎯 Test prep':'📚 School year'}</div>
+    <section class="adventure ${test?'testmode':''}">
+      ${test?`<h2>Get ready for your test!</h2><p class="testname">📝 ${esc(u.title)}<small>${esc(countdown(u))}</small></p>${meter}`
+        :`<h2>${fin?'Adventure done! 🎉':"Today's adventure"}</h2>`}
+      <ol class="trail">${trail}</ol>
+      ${fin?`<p class="sub">${test?(d!=null&&d<=1?"You're ready! 🌟 Good luck on your test!":'Great practice today. Come back tomorrow.'):'Come back tomorrow for a new one.'}</p>`:''}
+      <button class="playbig" id="play">${fin?(test?'▶ Practice more':'📚 My school year'):'▶ Play'}</button></section>
+    ${test?'<button class="secondary pick" id="pick">📚 Explore the school year</button>':fin?'':'<button class="secondary pick" id="pick">📚 My school year</button>'}
     ${stk.length?`<div class="stickers" aria-label="my stickers"><b>My stickers</b><span>${stk.slice(-12).join('')}</span></div>`:''}
-    <button class="grownbtn" id="grownBtn">For grown-ups: progress, tests &amp; settings</button>
+    <button class="grownbtn" id="grownBtn">${pend?'For grown-ups: how did the test go? 📝':'For grown-ups: progress, tests &amp; settings'}</button>
   </div>`;
-  $('#play').onclick=fin?pickGame:runStop;if(!fin)$('#pick').onclick=pickGame;$('#grownBtn').onclick=grown;
+  $('#play').onclick=fin?(test?()=>unitHome(u):pickGame):runStop;if($('#pick'))$('#pick').onclick=pickGame;$('#grownBtn').onclick=grown;
   const hi=nm?`Hi, ${nm}!`:'Hi!';
-  say(fin?[hi,300,'You finished today\'s adventure!',400,'You can choose a game, or come back tomorrow.']
+  say(test?[hi,300,...(fin?(d!=null&&d<=1?["You're ready for your test!",300,'Good luck!']:['Great practice today!'])
+      :[d===1?'Tomorrow is your test!':d===0?'Your test is today!':"Let's get ready for your test.",400,'Tap Play.'])]
+    :fin?[hi,300,'You finished today\'s adventure!',400,'Come back tomorrow for a new one.']
     :[hi,300,T.i===0?"Let's start today's adventure.":`Next stop: ${T.stops[T.i].title}.`,400,'Tap Play.']);
   nvWarm();
 }
 function runStop(){const T=today(),s=T.stops[T.i];if(!s){home();return}const {list,ctx}=stopSet(s);
   runRound(s.title,()=>makeSet(list,ctx),home,{stop:T.i})}
-// Pick your own: tests and subjects, one level below the adventure
+// 📚 My school year: every subject with how much is mastered, plus any tests. One level below home.
 function pickGame(){
-  setHeader('Choose a game',home);const units=visibleUnits();
-  const tiles=g=>Object.entries(SUBJECTS).filter(([,s])=>s.group===g).map(([k,s])=>`<button class="subj" style="--h:${s.h}" data-s="${k}"><span class="pic">${s.pic}</span><b>${s.name}</b></button>`).join('');
+  setHeader('My school year',home);const units=visibleUnits();
+  const tiles=g=>Object.entries(SUBJECTS).filter(([,s])=>s.group===g).map(([k,s])=>{const p=subjectProgress(k);
+    return `<button class="subj" style="--h:${s.h}" data-s="${k}"><span class="pic">${s.pic}</span><b>${s.name}</b>
+      <span class="subjbar" aria-label="${p.got} of ${p.total} mastered"><i style="width:${p.total?p.got/p.total*100:0}%"></i></span><small class="subjcount">⭐ ${p.got}/${p.total}</small></button>`}).join('');
   view.innerHTML=`<div class="col">
     ${units.map(u=>`<button class="banner" data-u="${u.id}"><span class="pic">📝</span><span><small>${countdown(u)}</small><b>${esc(u.title)}</b></span></button>`).join('')}
     <div class="subjects">${tiles('school')}</div>
@@ -195,14 +208,17 @@ function done(){
 // The end of today's adventure: what they practiced, a sticker, and a clear stop.
 function recap(got,n){
   const T=today(),st=newSticker(),names=T.did.filter(id=>SKILLS[id]).map(id=>SKILLS[id]);
-  setHeader("Today's adventure",home);
-  view.innerHTML=`<div class="col"><div class="stage done recap"><h1>You finished today's adventure!</h1>
+  const u=T.mode==='test'&&allUnits().find(x=>x.id===T.unit),rd=u&&readiness(u),d=u&&daysUntil(u.testDate),last=u&&d!=null&&d<=1;
+  const title=u?(last?"You're ready for your test! 🌟":'Great test practice!'):"You finished today's adventure!";
+  setHeader(u?'Test prep':"Today's adventure",home);
+  view.innerHTML=`<div class="col"><div class="stage done recap"><h1>${title}</h1>
     <div class="sticker" aria-label="new sticker">${st}</div><p class="sub">New sticker!</p>
+    ${u?`<div class="ready"><div class="readytop"><b>Ready for the test</b><span>${rd.pct}%</span></div><div class="bar"><i style="width:${rd.pct}%"></i></div></div>`:''}
     ${names.length?`<div class="learned"><b>Today you practiced</b><ul>${names.map(s=>`<li><span>${s.pic}</span>${esc(s.kid)}</li>`).join('')}</ul></div>`:''}
-    <button class="playbig" id="bye">See you tomorrow! 👋</button>
-    <div class="btnrow"><button class="secondary sm" id="more">🎨 Keep playing</button></div></div></div>`;
+    <button class="playbig" id="bye">${last?'Good luck! 🍀':'See you tomorrow! 👋'}</button>
+    <div class="btnrow"><button class="secondary sm" id="more">📚 Keep playing</button></div></div></div>`;
   const list=names.map(s=>s.kid.toLowerCase());
-  say(['Hooray!',300,"You finished today's adventure!",500,...(list.length?[`Today you practiced ${andList(list)}.`,500]:[]),'You earned a new sticker!']);
+  say(['Hooray!',300,title.replace(/ 🌟$/,''),500,...(list.length?[`Today you practiced ${andList(list)}.`,500]:[]),'You earned a new sticker!']);
   $('#bye').onclick=()=>{hush();home()};$('#more').onclick=()=>{hush();pickGame()};
 }
 
@@ -334,6 +350,8 @@ const caseLabel=l=>P.lcase==='upper'?l.toUpperCase():P.lcase==='lower'?l:l.toUpp
 // Links for grown-ups only (never on kid screens). They open in a new tab so the app stays put.
 const REPO_URL='https://github.com/ZhaoSerrano/my-kid-has-adhd',GUIDE_URL=REPO_URL+'#use-it-in-3-steps',TEST_GUIDE_URL=REPO_URL+'#add-your-kids-test-in-3-steps';
 const FEEDBACK_URL=REPO_URL+'/issues/new?template=parent-feedback.yml';
+// How a test went, asked on the grown-up screen after the test date (the number that matters most: did they pass?)
+const RESULTS=[['great','🎉 Went great'],['ok','🙂 Okay'],['hard','😕 Hard']];
 // Bump with every push, together with a CHANGELOG.md entry and a git tag (see CLAUDE.md → Releases).
 const APP_VERSION='2.0.0',CHANGELOG_URL=REPO_URL+'/blob/main/CHANGELOG.md';
 const extLink=(url,text)=>`<a href="${url}" target="_blank" rel="noopener">${text}</a>`;
@@ -344,10 +362,16 @@ function grown(){
     return `<details class="panel"><summary><h2>${SUBJECTS[sub].pic} ${SUBJECTS[sub].name}</h2><span class="small">${got}/${ids.length} got it · ${tried} tried</span></summary>
       <div>${ids.map(id=>{const m=mastery(id);return `<div class="skillrow"><span class="nm">${SKILLS[id].name}${id==='robot'?` · level ${P.robotLevel+1}`:''}</span><span class="pill ${m.lvl}">${m.label}</span><span class="cd">${stdLine(SKILLS[id])}</span></div>`}).join('')}</div></details>`};
   const working=Object.entries(P.items||{}).filter(([,v])=>v.b===1).reverse().slice(0,15);
-  const hidden=hiddenUnits(),who=u=>!u.for?'All kids':(PROFILES.find(p=>p.id===u.for)||{}).name||'One child';
+  const hidden=hiddenUnits(),who=u=>!u.for?'All kids':(PROFILES.find(p=>p.id===u.for)||{}).name||'One child',fu=focusUnit();
   const vz=voiceFor('zh'),ve=voiceFor('es');
   view.innerHTML=`<div class="col">
     <nav class="linkrow" aria-label="Guide">📖 ${extLink(GUIDE_URL,'How to use it')}<span>·</span>${extLink(TEST_GUIDE_URL,'How to add a test')}<span>·</span>${extLink(REPO_URL,'Project on GitHub')}</nav>
+    <div class="panel"><h2>${fu?'🎯':'📚'} Test prep</h2>
+      ${resultPending().map(u=>`<div class="msg warn"><b>How did “${esc(u.title)}” go?</b><div class="btnrow left">${RESULTS.map(([k,t])=>`<button class="secondary sm" data-res="${u.id}|${k}">${t}</button>`).join('')}</div></div>`).join('')}
+      <div class="seg" id="focusSeg">${[['auto','Auto'],['test','🎯 On'],['year','📚 Off']].map(([k,t])=>`<button data-f="${k}" class="${(P.focus||'auto')===k?'on':''}" aria-pressed="${(P.focus||'auto')===k}">${t}</button>`).join('')}</div>
+      <p class="small"><b>Right now:</b> ${fu?`🎯 test prep for “${esc(fu.title)}” (${esc(countdown(fu))}), ${readiness(fu).pct}% ready. Every stop is about this test.`
+        :`📚 school year: the daily adventure covers the whole year.${(P.focus||'auto')==='test'?' There is no test to practice yet. Add one below.':''}`}</p>
+      <p class="small"><b>Auto</b> turns test prep on within ${TEST_WINDOW} days of a test date, or for a test with no date (the example test doesn't count). <b>On</b> practices only the test. <b>Off</b> practices the whole school year. Use <b>🎯 Focus</b> on a test below to pick which one.</p></div>
     <div class="panel"><h2>Child</h2>
       <label class="field"><span>Name (optional, stays on this device)</span><input id="kidName" maxlength="30" autocomplete="off" value="${esc(me.name||'')}"></label>
       <div><span class="small">Favorite things (pictures in math and the robot game)</span>
@@ -355,10 +379,10 @@ function grown(){
       <div class="btnrow left">${PROFILES.length>1?'<button class="secondary" id="switchKid">Switch child</button>':''}<button class="secondary" id="addKid">+ Add a child</button>
         ${PROFILES.length>1?`<button class="secondary danger" id="rmKid">Remove ${esc(kidLabel(me,idx))}</button>`:''}</div></div>
     <div class="panel"><h2>Tests</h2>
-      <p class="small">Turn the teacher's study guide into practice. Each test gets its own banner on the home screen.</p>
+      <p class="small">Turn the teacher's study guide into practice. When a test is coming, the app switches to 🎯 Test prep (see above).</p>
       ${allUnits().map(u=>`<div class="unitrow ${hidden.includes(u.id)?'off':''}"><div><b>${esc(u.title)}</b>${u.example?' <span class="tag">example</span>':''}<br>
-        <span class="small">${unitSummary(u)}${u.testDate?` · ${fmtDate(u.testDate)}`:''}${PROFILES.length>1?` · ${esc(who(u))}`:''}</span></div>
-        <div class="btnrow"><button class="secondary sm" data-hide="${u.id}">${hidden.includes(u.id)?'Show':'Hide'}</button>${u.example?'':`<button class="secondary sm danger" data-del="${u.id}">Delete</button>`}</div></div>`).join('')}
+        <span class="small">${unitSummary(u)}${u.testDate?` · ${fmtDate(u.testDate)}`:''}${PROFILES.length>1?` · ${esc(who(u))}`:''}${testResult(u)?` · Result: ${(RESULTS.find(r=>r[0]===testResult(u).r)||['',''])[1]}`:''}${fu&&fu.id===u.id?' · <b>🎯 practicing now</b>':''}</span></div>
+        <div class="btnrow">${testResult(u)||(fu&&fu.id===u.id)?'':`<button class="secondary sm" data-focus="${u.id}">🎯 Focus</button>`}<button class="secondary sm" data-hide="${u.id}">${hidden.includes(u.id)?'Show':'Hide'}</button>${u.example?'':`<button class="secondary sm danger" data-del="${u.id}">Delete</button>`}</div></div>`).join('')}
       <div class="btnrow left"><button class="primary" id="addTest">+ Add a test</button></div></div>
     <div class="panel"><h2>Working on now</h2>
       ${working.length?`<ul class="worklist">${working.map(([id,v])=>`<li><b>${(SKILLS[id.split(':')[0]]||{name:''}).name}</b> ${esc(v.l||'')}</li>`).join('')}</ul>
@@ -401,6 +425,11 @@ function grown(){
   $('#addKid').onclick=welcome;
   if($('#rmKid'))twoTap($('#rmKid'),`Tap again to remove ${kidLabel(me,idx)} and their progress`,()=>{removeProfile(me.id);P=null;start()});
   view.querySelectorAll('[data-hide]').forEach(b=>b.onclick=()=>{const id=b.dataset.hide;setUnitHidden(id,!hiddenUnits().includes(id));grown()});
+  // test prep on / off / auto, which test to focus on, and how a test went
+  $('#focusSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{P.focus=b.dataset.f;if(P.focus!=='test')P.focusId=null;saveP();grown()});
+  view.querySelectorAll('[data-focus]').forEach(b=>b.onclick=()=>{P.focus='test';P.focusId=b.dataset.focus;saveP();grown()});
+  view.querySelectorAll('[data-res]').forEach(b=>b.onclick=()=>{const [id,r]=b.dataset.res.split('|');
+    P.testResults=Object.assign({},P.testResults,{[id]:{r,at:todayKey()}});if(P.focusId===id){P.focusId=null;if(P.focus==='test')P.focus='auto'}saveP();grown()});
   view.querySelectorAll('[data-del]').forEach(b=>twoTap(b,'Tap to delete',()=>{deleteUnit(b.dataset.del);grown()}));
   $('#addTest').onclick=addTest;
   $('#letters').querySelectorAll('button').forEach(b=>b.onclick=()=>{const l=b.dataset.l,on=P.letters.includes(l);

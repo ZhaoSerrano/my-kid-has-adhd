@@ -4,14 +4,17 @@ Every update to the app gets a version number and a short note here. The version
 
 Version numbers work like this: **2.0.0** = a big change in how the app works, **1.2.0** = a new feature, **1.0.1** = a small fix.
 
-## 2.0.0 — Oct 26, 2026 — Today's Adventure
+## 2.0.0 — Oct 26, 2026 — Test prep and the school year, one goal at a time
 
 A new, guided way to play, based on what works in apps like Khan Academy Kids and Duolingo ABC, and on research about ADHD and memory.
 
-- **One big "Play" button.** Home is now *Today's Adventure*: three short stops, about 5 questions each.
-  1. **Warm-up:** brings back things your child missed before, so they stick.
-  2. **Test practice:** the teacher's test, when one is coming up (otherwise, the skill that needs the most practice).
-  3. **Something new:** a skill they haven't tried yet.
+- **Two clear modes, picked automatically.**
+  - **🎯 Test prep** when a test is within 14 days (or has no date). Home says *"Get ready for your test!"* with a countdown, and **every stop is about that test**: Warm-up (what was missed), Practice (the weakest part), and a **Mini test** in the real test's format. The day before the test, it's the **full practice test** and *"You're ready! 🌟"*.
+  - **📚 School year** the rest of the time: the daily adventure covers the whole kindergarten year, with **My school year** showing progress in every subject.
+- **"Ready for the test" meter.** Shows, part by part, how much your child answers right on the first try (for example, *Words 7/10*).
+- **Test prep on/off by hand.** In **For grown-ups → Test prep**: *Auto*, *🎯 On*, or *📚 Off*, plus a **🎯 Focus** button on each test.
+- **"How did the test go?"** After the test date, the grown-up screen asks, with one tap: *Went great*, *Okay*, or *Hard*. Then the app goes back to the school year.
+- **One big "Play" button.** Each day is three short stops, about 5 questions each. In school-year mode: Warm-up, Practice, and **Something new**.
 - **Always a clear next step.** After a round, the big button says *"Next: Something new →"* or *"Try something new"*. "Play again" is now a small, secondary choice.
 - **A recap and a sticker at the end of the day.** "Today you practiced…", a sticker from your child's favorite things, and "See you tomorrow!" Stickers collect on the home screen.
 - **Fewer choices on the home screen:** 3 buttons instead of about 15. All subjects are still there under **Choose a game**.

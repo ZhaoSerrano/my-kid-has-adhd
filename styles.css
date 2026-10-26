@@ -255,6 +255,23 @@ details summary.small{cursor:pointer}
 .stop .me{position:absolute;top:0;font-size:1.7rem;line-height:1;z-index:1;animation:bob 1.4s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-5px)}}
 .pick{align-self:center}
+/* the two modes: 🎯 test prep (orange) and 📚 school year (blue) */
+.modechip{align-self:center;font:700 .95rem var(--f-ui);padding:6px 16px;border-radius:999px;margin-bottom:-6px}
+.modechip.test{background:var(--no-bg);color:var(--no)}
+.modechip.year{background:var(--read-bg);color:var(--read)}
+.adventure.testmode{border-color:var(--no)}
+.testname{margin:-6px 0 0;font:700 1.15rem var(--f-ui);display:flex;flex-direction:column;gap:2px}
+.testname small{font:600 .9rem var(--f-ui);color:var(--no)}
+.ready{background:var(--paper);border-radius:16px;padding:12px 14px;text-align:left;width:100%;box-sizing:border-box}
+.readytop{display:flex;justify-content:space-between;align-items:baseline}
+.readytop span{font:700 1.4rem var(--f-ui);color:var(--yes);font-variant-numeric:tabular-nums}
+.bar,.subjbar{display:block;height:10px;border-radius:999px;background:var(--edge);overflow:hidden;margin-top:6px}
+.bar i,.subjbar i{display:block;height:100%;background:var(--yes);border-radius:999px}
+.ready ul{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.92rem}
+.ready li{display:flex;align-items:center;gap:8px}
+.ready li em{margin-left:auto;font-style:normal;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.subjbar{width:80%;height:6px;margin-top:2px;background:rgba(127,127,127,.25)}
+.subjcount{font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .stickers{display:flex;flex-direction:column;align-items:center;gap:4px}
 .stickers b{font-size:.85rem;color:var(--muted)}
 .stickers span{font-size:1.8rem;letter-spacing:4px}
