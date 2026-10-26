@@ -166,6 +166,7 @@ button.chip{cursor:pointer}
 .pill.got{background:var(--yes-bg);color:var(--yes)} .pill.mid{background:#0000;border:1.5px solid var(--star);color:var(--ink)} .pill.low{background:var(--no-bg);color:var(--no)}
 .letters{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px}
 .letters button{height:42px;border-radius:10px;border:2px solid var(--edge);background:var(--paper);color:var(--muted);font:700 1.2rem var(--f-read);cursor:pointer}
+.panel h3{font:700 1rem var(--f-ui);margin:6px 0 -4px}
 .letters button.on{background:var(--read);border-color:var(--read);color:var(--paper)}
 .seg{display:flex;gap:6px}
 .seg button{flex:1;padding:10px;border-radius:10px;border:2px solid var(--edge);background:var(--paper);color:var(--ink);font-weight:600;cursor:pointer}

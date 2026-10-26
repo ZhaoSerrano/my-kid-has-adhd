@@ -51,7 +51,7 @@ Optional question fields: `whyText` (screen text when it differs from the spoken
 
 ### Storage keys
 - `mkha_profiles` = `[{id,name,theme}]`; `mkha_last` = last profile id.
-- `lab_<profileId>` holds the profile's progress (`stars`, `skills{id:[1,0,…last 10]}`, `items{skill:item:{b,l}}`, `letters`, `maxCount`, `robotLevel`). Old `lab_*` keys with no `mkha_profiles` are migrated to profiles on first start.
+- `lab_<profileId>` holds the profile's progress (`stars`, `skills{id:[1,0,…last 10]}`, `items{skill:item:{b,l}}`, `letters`, `lcase`, `maxCount`, `robotLevel`). Defaults live in `freshProgress()` in `js/core.js` (also used by Reset): all 26 letters, `lcase:'both'`, counting to 10. `lcase` ('lower' | 'upper' | 'both') sets how letters look in letter sounds, find the letter and tracing (`upperNow()`); with 'both' each question picks a case at random. Old `lab_*` keys with no `mkha_profiles` are migrated to profiles on first start.
 - `mkha_units` = parent-added units (schema below, plus `id` and optional `for` = profile id). `mkha_hidden` = hidden unit ids (the built-in example can be hidden, not deleted).
 - `u3voice` holds voice preferences (`name`, `rate`, `natural`, `nvoice`).
 - `mkha_appearance` = `"light"` or `"dark"` (JSON-encoded; absent = Auto, follows the device). A small inline script in `index.html` sets `data-theme` on `<html>` before the page draws.

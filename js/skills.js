@@ -9,7 +9,7 @@ const countAloud=n=>Array.from({length:n},(_,i)=>i+1).join(', ');
 const plural=(n,it)=>n===1?it[1]:it[2];
 
 function gLetterName(){
-  const L=one(ALPHA),up=Math.random()<.5,f=x=>up?x.toUpperCase():x;
+  const L=one(ALPHA),up=upperNow(),f=x=>up?x.toUpperCase():x;
   const opts=shuffle([L,...pick(ALPHA.filter(x=>x!==L),2)]);
   return {key:'ln'+L+up,prompt:[`Find the ${up?'big':'small'} letter`,250,`${L.toUpperCase()}.`],
     grown:`Find the ${up?'uppercase':'lowercase'} <b>${f(L)}</b>.`,
@@ -18,14 +18,14 @@ function gLetterName(){
 }
 function gLetterSound(ctx){
   const pool=(ctx.letters&&ctx.letters.length?ctx.letters:P.letters.length?P.letters:['s','m','d','p','a']);
-  const t=one(pool),[snd,clue]=PHON[t];
+  const t=one(pool),[snd,clue]=PHON[t],up=upperNow(),f=x=>up?x.toUpperCase():x;
   const clash=l=>PHON[l][0]===snd;
   const others=shuffle([...pool.filter(x=>x!==t),...ALPHA]).filter((x,i,a)=>x!==t&&!clash(x)&&a.indexOf(x)===i);
   const opts=shuffle([t,...others.slice(0,2)]);
-  return {key:'ls'+t,prompt:['What letter makes this sound?',700,snd,600,snd,800,`Like ${clue}.`],
+  return {key:'ls'+t+up,item:'ls'+t,prompt:['What letter makes this sound?',700,snd,600,snd,800,`Like ${clue}.`],
     grown:`Sound <b>/${t}/</b> as in “${clue}”. On the test the teacher says only the sound.`,
-    options:opts.map(l=>({html:`<span class="lined">${l}</span>`,cls:'letter',label:'letter '+l,ok:l===t})),
-    why:[`The letter ${t.toUpperCase()} says`,200,snd,300,`like ${clue}.`],whyText:`The letter ${t} says /${snd}/, like ${clue}.`};
+    options:opts.map(l=>({html:`<span class="lined">${f(l)}</span>`,cls:'letter',label:'letter '+l,ok:l===t})),
+    why:[`The letter ${t.toUpperCase()} says`,200,snd,300,`like ${clue}.`],whyText:`The letter ${f(t)} says /${snd}/, like ${clue}.`};
 }
 function gBegin(){
   const groups={};PICS.forEach(p=>(groups[p[2]]=groups[p[2]]||[]).push(p));
@@ -225,7 +225,7 @@ function mcq(key,prompt,grown,right,wrongs,why,read){
 const faceOpts=yes=>[{html:FACE(true),cls:'face happy',label:'happy face',ok:yes},{html:FACE(false),cls:'face sad',label:'sad face',ok:!yes}];
 
 /* --- writing --- */
-function gTraceLetter(){const L=Math.random()<.6&&P.letters.length?one(P.letters):one(ALPHA),up=Math.random()<.5,g=up?L.toUpperCase():L;
+function gTraceLetter(){const L=Math.random()<.6&&P.letters.length?one(P.letters):one(ALPHA),up=upperNow(),g=up?L.toUpperCase():L;
   return {key:'tl'+g,mode:'trace',glyph:g,prompt:['Trace the',200,up?'big letter':'small letter',200,`${L.toUpperCase()}.`],
     grown:`Trace <b>${g}</b> with one finger. Start at the top. Any reasonable trace passes.`,why:['Good try!',300,"Let's do another one."]}}
 function gTraceNum(){const n=rnd(0,P.maxCount>10?20:9);

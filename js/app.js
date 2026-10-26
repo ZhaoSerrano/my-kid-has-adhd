@@ -277,6 +277,7 @@ function fillVoiceSel(sel){
 const stdLine=s=>{if(/^(Unit|World)/.test(s.std))return s.std;
   const cc=s.cc?` · ${/^K-[A-Z]/.test(s.cc)?'NGSS':'Common Core'} ${s.cc}`:'';return `Indiana ${s.std}${cc}`};
 const fmtDate=iso=>{const [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})};
+const caseLabel=l=>P.lcase==='upper'?l.toUpperCase():P.lcase==='lower'?l:l.toUpperCase()+l;
 const FEEDBACK_URL='https://github.com/ZhaoSerrano/my-kid-has-adhd/issues/new?template=parent-feedback.yml';
 function twoTap(btn,msg,fn){let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent=msg;return}fn()}}
 function grown(){
@@ -307,8 +308,10 @@ function grown(){
     <p class="small"><b>How “Got it” works:</b> 80% or more right on the first try over the last 10 tries in that skill, with at least 5 tries. 50–79% is “Getting there.” <b>Play a mix</b> gives more turns to the skills that need practice. Tap a subject to see each skill.</p>
     ${Object.keys(SUBJECTS).map(sec).join('')}
     <p class="small"><b>About the standards:</b> Skills are mapped to Indiana's kindergarten standards and, where one exists, the matching Common Core code (reading, writing and math) or NGSS code (science). Math uses Indiana's 2026 standards, which schools start teaching in 2027–28. Science, social studies, health and music cover the kindergarten pieces that work as tap-to-answer questions. Chinese and Spanish are enrichment, not a kindergarten requirement.</p>
-    <div class="panel"><h2>Letters learned so far</h2><p class="small">Letter-sound practice asks only about these, and letter tracing favors them. Turn on new letters as the class covers them.</p>
-      <div class="letters" id="letters">${ALPHA.map(l=>`<button data-l="${l}" class="${P.letters.includes(l)?'on':''}" aria-pressed="${P.letters.includes(l)}">${l}</button>`).join('')}</div></div>
+    <div class="panel"><h2>Letters learned so far</h2><p class="small">Letter-sound practice in Reading uses only these, and letter tracing favors them. Tests use their own letters. Turn off letters the class hasn't covered yet.</p>
+      <div class="letters" id="letters">${ALPHA.map(l=>`<button data-l="${l}" class="${P.letters.includes(l)?'on':''}" aria-pressed="${P.letters.includes(l)}">${caseLabel(l)}</button>`).join('')}</div>
+      <h3>Letter case</h3><div class="seg" id="lcase">${[['lower','lowercase'],['upper','UPPERCASE'],['both','Both']].map(([k,t])=>`<button data-c="${k}" class="${P.lcase===k?'on':''}" aria-pressed="${P.lcase===k}">${t}</button>`).join('')}</div>
+      <p class="small">How letters look in Letter sounds, Find the letter and Trace letters. <b>Both</b> mixes big and small letters so your child learns both shapes.</p></div>
     <div class="panel"><h2>Counting range</h2><div class="seg" id="seg">${[10,20].map(n=>`<button data-n="${n}" class="${P.maxCount===n?'on':''}">Up to ${n}</button>`).join('')}</div>
       <p class="small">Kindergarten builds to 20 by spring. Start at 10.</p></div>
     <div class="panel"><h2>Light or dark</h2><div class="seg" id="look">${[['auto','Auto'],['light','☀️ Light'],['dark','🌙 Dark']].map(([k,t])=>`<button data-a="${k}" class="${appearance()===k?'on':''}" aria-pressed="${appearance()===k}">${t}</button>`).join('')}</div>
@@ -341,6 +344,9 @@ function grown(){
   $('#addTest').onclick=addTest;
   $('#letters').querySelectorAll('button').forEach(b=>b.onclick=()=>{const l=b.dataset.l,on=P.letters.includes(l);
     if(on&&P.letters.length===1)return;P.letters=on?P.letters.filter(x=>x!==l):[...P.letters,l];b.classList.toggle('on',!on);b.setAttribute('aria-pressed',!on);saveP()});
+  $('#lcase').querySelectorAll('button').forEach(b=>b.onclick=()=>{P.lcase=b.dataset.c;saveP();
+    $('#lcase').querySelectorAll('button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',x===b)});
+    $('#letters').querySelectorAll('button').forEach(x=>{x.textContent=caseLabel(x.dataset.l)})});
   $('#seg').querySelectorAll('button').forEach(b=>b.onclick=()=>{P.maxCount=+b.dataset.n;saveP();$('#seg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
   $('#look').querySelectorAll('button').forEach(b=>b.onclick=()=>{setAppearance(b.dataset.a);
     $('#look').querySelectorAll('button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',x===b)})});
@@ -363,8 +369,8 @@ function grown(){
   $('#testZh').onclick=()=>say([{t:'你好！我是熊猫。',lang:'zh'}]);
   $('#testEs').onclick=()=>say([{t:'¡Hola! Me gusta el perro.',lang:'es'}]);
   // A fresh start for this child: stars, practice history, robot level, letters and counting range. Name, theme and tests stay.
-  twoTap($('#reset'),'Tap again to start fresh: erases stars, progress and letters',()=>{Object.assign(P,freshProgress());saveP();updStars();grown();
-    const b=$('#reset');b.insertAdjacentHTML('beforebegin',`<div class="msg good" role="status">Done. ${esc(kidLabel(me,idx))} is starting fresh: 0 stars, letters back to s, m, d, p, a, counting up to 10.</div>`);
+  twoTap($('#reset'),'Tap again to start fresh: resets stars, progress and letter settings',()=>{Object.assign(P,freshProgress());saveP();updStars();grown();
+    const b=$('#reset');b.insertAdjacentHTML('beforebegin',`<div class="msg good" role="status">Done. ${esc(kidLabel(me,idx))} is starting fresh: 0 stars, all 26 letters on, letters shown both ways, counting up to 10.</div>`);
     b.scrollIntoView({block:'center'})});
 }
 

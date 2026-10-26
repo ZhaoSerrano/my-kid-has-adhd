@@ -28,7 +28,9 @@ function loadProfiles(){
 function saveProfiles(){store.set('mkha_profiles',PROFILES)}
 function addProfile(name){const p={id:'k'+Date.now().toString(36)+rnd(10,99),name:(name||'').trim().slice(0,30),theme:''};PROFILES.push(p);saveProfiles();return p}
 function removeProfile(id){PROFILES=PROFILES.filter(p=>p.id!==id);saveProfiles();store.del('lab_'+id);if(store.get('mkha_last','')===id)store.del('mkha_last')}
-const freshProgress=()=>({stars:0,skills:{},items:{},letters:['s','m','d','p','a'],maxCount:10,robotLevel:0});
+// lcase: how letters are shown in letter sounds, find the letter and tracing: 'lower', 'upper' or 'both' (random each question)
+const freshProgress=()=>({stars:0,skills:{},items:{},letters:ALPHA.slice(),lcase:'both',maxCount:10,robotLevel:0});
+const upperNow=()=>P.lcase==='upper'?true:P.lcase==='lower'?false:Math.random()<.5;
 function loadProfile(id){
   const d=store.get('lab_'+id,{});
   P=Object.assign(freshProgress(),d,{id});
