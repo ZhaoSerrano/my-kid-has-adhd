@@ -13,6 +13,14 @@ Learning Lab started with one kindergarten study guide: "How can I help my child
 - **Short rounds** of 3 to 5 minutes, with stars and wiggle breaks.
 - **A whole kindergarten year** across reading, writing, math, science, social studies, coding, feelings and safety, music, Chinese and Spanish. Skills are mapped to Indiana and Common Core standards, so you can see what's covered.
 
+## Built around a finish line
+
+This isn't open-ended "study time." Kids with ADHD do best with a clear goal, a clear start and a clear stop, so Learning Lab is built around the real test coming home from school:
+
+- **A real goal.** Your kid's study guide becomes a practice test, with a countdown on the home screen: "Test in 3 days."
+- **A clear start and stop.** Each round is 3 to 5 minutes. Progress dots show how many questions are left, and stars mark the finish.
+- **Results you can see.** The practice test shows what's ready before test day, and **For grown-ups** marks every skill "Got it," "Getting there" or "Needs practice," so you know what to work on tonight.
+
 ## Use it in 3 steps
 
 1. **Open the app** on a phone, tablet or computer: https://zhaoserrano.github.io/my-kid-has-adhd/. On an iPad or iPhone, tap Share → **Add to Home Screen** so it opens like an app.
