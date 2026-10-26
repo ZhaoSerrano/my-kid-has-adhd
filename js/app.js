@@ -357,7 +357,10 @@ function grown(){
   $('#testVoice').onclick=testV;
   $('#testZh').onclick=()=>say([{t:'你好！我是熊猫。',lang:'zh'}]);
   $('#testEs').onclick=()=>say([{t:'¡Hola! Me gusta el perro.',lang:'es'}]);
-  twoTap($('#reset'),'Tap again to erase stars and progress',()=>{P.stars=0;P.skills={};P.items={};P.robotLevel=0;saveP();updStars();grown()});
+  // A fresh start for this child: stars, practice history, robot level, letters and counting range. Name, theme and tests stay.
+  twoTap($('#reset'),'Tap again to start fresh: erases stars, progress and letters',()=>{Object.assign(P,freshProgress());saveP();updStars();grown();
+    const b=$('#reset');b.insertAdjacentHTML('beforebegin',`<div class="msg good" role="status">Done. ${esc(kidLabel(me,idx))} is starting fresh: 0 stars, letters back to s, m, d, p, a, counting up to 10.</div>`);
+    b.scrollIntoView({block:'center'})});
 }
 
 /* ---- add a test from the teacher's study guide ---- */

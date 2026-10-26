@@ -28,9 +28,10 @@ function loadProfiles(){
 function saveProfiles(){store.set('mkha_profiles',PROFILES)}
 function addProfile(name){const p={id:'k'+Date.now().toString(36)+rnd(10,99),name:(name||'').trim().slice(0,30),theme:''};PROFILES.push(p);saveProfiles();return p}
 function removeProfile(id){PROFILES=PROFILES.filter(p=>p.id!==id);saveProfiles();store.del('lab_'+id);if(store.get('mkha_last','')===id)store.del('mkha_last')}
+const freshProgress=()=>({stars:0,skills:{},items:{},letters:['s','m','d','p','a'],maxCount:10,robotLevel:0});
 function loadProfile(id){
   const d=store.get('lab_'+id,{});
-  P=Object.assign({stars:0,skills:{},items:{},letters:['s','m','d','p','a'],maxCount:10,robotLevel:0},d,{id});
+  P=Object.assign(freshProgress(),d,{id});
   P.meta=PROFILES.find(p=>p.id===id)||{id,name:'',theme:''};store.set('mkha_last',id);updStars();
 }
 function saveP(){try{const {meta,...rest}=P;localStorage.setItem('lab_'+P.id,JSON.stringify(rest))}catch(e){}}
