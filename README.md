@@ -59,4 +59,4 @@ It's a static site: plain HTML, CSS and JavaScript, with no build step and no ba
 
 ## License
 
-Code: [MIT](LICENSE). Content (questions, stories, explanations, word lists): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The optional natural voice uses [kokoro-js](https://github.com/hexgrad/kokoro) and the Kokoro-82M model, both Apache 2.0, loaded from a CDN, not bundled here.
+Code: [MIT](LICENSE). Content (questions, stories, explanations, word lists): [CC BY 4.0](LICENSE-CONTENT.md). The optional natural voice uses [kokoro-js](https://github.com/hexgrad/kokoro) and the Kokoro-82M model, both Apache 2.0, loaded from a CDN, not bundled here.
