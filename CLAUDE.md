@@ -53,7 +53,16 @@ Optional question fields: `whyText` (screen text when it differs from the spoken
 - `mkha_profiles` = `[{id,name,theme}]`; `mkha_last` = last profile id.
 - `lab_<profileId>` holds the profile's progress (`stars`, `skills{id:[1,0,…last 10]}`, `items{skill:item:{b,l}}`, `letters`, `maxCount`, `robotLevel`). Old `lab_*` keys with no `mkha_profiles` are migrated to profiles on first start.
 - `mkha_units` = parent-added units (schema below, plus `id` and optional `for` = profile id). `mkha_hidden` = hidden unit ids (the built-in example can be hidden, not deleted).
-- `u3voice` holds voice preferences.
+- `u3voice` holds voice preferences (`name`, `rate`, `natural`, `nvoice`).
+- Natural voice: generated lines are saved in IndexedDB `mkha-voice` (store `clips`, Int16 audio, key `voice|rate|text`); `mkha_nv_keys` lists them oldest first (newest 800 kept). `mkha_nv_trying` is set while the model loads, so a crash during loading (an older iPad out of memory) doesn't auto-retry on the next start.
+
+### Natural voice (optional, in `js/core.js`)
+- Kokoro-82M via `kokoro-js@1.2.1` (Apache 2.0), q8 on WASM (~92 MB model, cached by the browser). WebGPU with q8 tested about 4× slower, so it isn't used.
+- It runs in a module Web Worker built from a Blob (works from `file://`). On the main thread each line froze the page for 2–4 s.
+- Speed measured on an 8-core Mac: about 1.6 s of compute per second of speech single-threaded, about 0.9 s with cross-origin isolation (multithreaded). GitHub Pages can't send the COOP/COEP headers; a coi-serviceworker would be needed. Not done yet.
+- Rule: **a child never waits.** `say()` uses the natural voice only when every line is already made (memory or IndexedDB); otherwise the device voice reads it and the lines are queued for next time.
+- Queue priorities: 0 = speaking now, 1 = this round's prompts and whys (`runRound`, `showQ`), 2 = idle warm-up (`nvWarm`: feedback phrases, visible units' words, stories and questions, letter sounds). Chinese and Spanish always use the device voice.
+- Not yet tested on a real iPad or iPhone.
 
 ## Status
 

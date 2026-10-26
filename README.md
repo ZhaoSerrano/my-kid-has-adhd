@@ -19,7 +19,7 @@ Learning Lab started with one kindergarten study guide: "How can I help my child
 2. **Type your child's name** (optional), then hand it over so they can pick what they like best.
 3. **Tap a subject, or the test banner at the top**, and play. Check **For grown-ups** to see what's solid and what needs practice.
 
-Tip: on iPhone or iPad, download a better voice in Settings › Accessibility › Spoken Content › Voices (for example, English "Ava (Premium)"). Then choose it in **For grown-ups → Voice**.
+**Want a more natural voice?** Turn on **Natural voice** in **For grown-ups → Voice**. It's a free, open-source AI voice ([Kokoro](https://huggingface.co/hexgrad/Kokoro-82M)) that runs right in the browser. It downloads once (about 100 MB, so use Wi-Fi). Lines it hasn't prepared yet are read by the device voice so your child never waits; test content, feedback and letter sounds are prepared ahead of time, and anything heard once is saved for next time. Or, on iPhone and iPad, download a better device voice in Settings › Accessibility › Spoken Content › Voices (for example, English "Ava (Premium)").
 
 ## Add your kid's test in 3 steps
 
@@ -34,6 +34,7 @@ Each test gets Word cards, a Words quiz, Letter sounds, Stories, the teacher's o
 - **No account, no sign-up, no ads, no tracking.**
 - Names, progress and tests are saved **only in the browser on your device**. Nothing is sent to us or anyone else.
 - The only time anything leaves your device is when *you* paste the prompt and photo into an AI chat yourself. Don't include your child's name or private details there.
+- If you turn on **Natural voice**, the app downloads the voice files from public hosts (jsDelivr and Hugging Face). That's a download only: the words it reads are made on your device and never sent anywhere.
 - Clearing the browser's website data erases the progress.
 
 ## What it is, and what it isn't
@@ -58,4 +59,4 @@ It's a static site: plain HTML, CSS and JavaScript, with no build step and no ba
 
 ## License
 
-Code: [MIT](LICENSE). Content (questions, stories, explanations, word lists): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+Code: [MIT](LICENSE). Content (questions, stories, explanations, word lists): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The optional natural voice uses [kokoro-js](https://github.com/hexgrad/kokoro) and the Kokoro-82M model, both Apache 2.0, loaded from a CDN, not bundled here.

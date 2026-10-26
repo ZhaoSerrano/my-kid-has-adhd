@@ -4,7 +4,7 @@ function setHeader(title,back){$('#hdrTitle').textContent=title;backFn=back||nul
 $('#backBtn').onclick=()=>{hush();backFn&&backFn()};
 const speakName=s=>s.replace(/&/g,'and');
 
-function start(){loadProfiles();
+function start(){loadProfiles();if(pref.natural&&!nvCrashed())nvLoad();
   if(!PROFILES.length){welcome();return}
   if(PROFILES.length===1){enter(PROFILES[0]);return}
   picker()}
@@ -56,6 +56,7 @@ function home(){
   view.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>unitHome(allUnits().find(u=>u.id===b.dataset.u)));
   view.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>subject(b.dataset.s));
   $('#grownBtn').onclick=grown;
+  nvWarm();
 }
 function subject(sub){
   const S=SUBJECTS[sub],ids=Object.keys(SKILLS).filter(id=>SKILLS[id].sub===sub&&!SKILLS[id].unitOnly);
@@ -92,7 +93,7 @@ function deck(title,items,i,back){
     ${items.length<=16?`<div class="progress">${items.map((_,k)=>`<i class="${k<i?'done':''} ${k===i?'now':''}"></i>`).join('')}</div>`:`<p class="sub" style="text-align:center;font-variant-numeric:tabular-nums">${i+1} of ${items.length}</p>`}
     <div class="stage">${it.big}${it.word}${it.def?`<p class="def">${it.def}</p>`:''}${it.ex?`<p class="ex">${it.ex}</p>`:''}<button class="listen" id="hear">${SPK} Hear it</button></div>
     <div class="cardnav"><button id="prev" ${i===0?'disabled':''}>← Back</button><button id="next">${i===items.length-1?'Done ✓':'Next →'}</button></div></div>`;
-  const read=()=>say(it.speak);$('#hear').onclick=read;read();
+  const read=()=>say(it.speak);$('#hear').onclick=read;read();if(items[i+1])nvPrefetch(items[i+1].speak);
   $('#prev').onclick=()=>i>0&&deck(title,items,i-1,back);
   $('#next').onclick=()=>i<items.length-1?deck(title,items,i+1,back):(hush(),back());
 }
@@ -100,7 +101,7 @@ function deck(title,items,i,back){
 /* ================= round runner ================= */
 let R=null,roundsDone=0;
 const MAX_EXTRAS=2;
-function runRound(title,make,back){hush();R={title,make,back,qs:make(),i:0,res:[],extras:0};showQ()}
+function runRound(title,make,back){hush();R={title,make,back,qs:make(),i:0,res:[],extras:0};R.qs.forEach(q=>nvPrefetch(q.prompt));showQ()}
 // A missed question comes back once at the end of the round, reshuffled (at most MAX_EXTRAS per round).
 function requeue(q){if(q.again||q.mode==='robot'||R.extras>=MAX_EXTRAS)return;R.extras++;
   R.qs.push(Object.assign({},q,{again:true,key:q.key+'#again',options:q.options&&shuffle(q.options),prompt:["Let's try this one again.",500,...q.prompt]}))}
@@ -132,6 +133,8 @@ function showQ(){
     fb,
   };
   (MOUNTS[q.mode||'choose'])(q,st,api);
+  // get the natural voice ready for what's likely next: the explanation, then the next question
+  nvPrefetch(q.why);
 }
 function nextQ(){R.i++;R.i<R.qs.length?showQ():done()}
 const WIGGLES=[['🦘','Jump 5 times!'],['🙆','Touch your toes 5 times.'],['🌳','Stretch up tall like a tree.'],['🐸','Hop like a frog 3 times.'],['👏','Clap your hands 10 times.'],
@@ -308,7 +311,11 @@ function grown(){
     <div class="panel"><h2>Counting range</h2><div class="seg" id="seg">${[10,20].map(n=>`<button data-n="${n}" class="${P.maxCount===n?'on':''}">Up to ${n}</button>`).join('')}</div>
       <p class="small">Kindergarten builds to 20 by spring. Start at 10.</p></div>
     <div class="panel"><h2>Voice</h2>
-      <div class="vrow"><label for="voiceSel">English voice</label><select id="voiceSel"></select></div>
+      <label class="switch"><input type="checkbox" id="nvOn" ${pref.natural?'checked':''}><span><b>Natural voice</b> <span class="tag">beta</span></span></label>
+      <p class="small">A free, open-source AI voice that sounds much more like a person. It downloads once (about 100 MB, so use Wi-Fi), then runs on this device. The words it reads never leave the device. English only.</p>
+      <div class="vrow" id="nvRow"><label for="nvSel">Natural voice</label><select id="nvSel">${NV_VOICES.map(([id,nm])=>`<option value="${id}" ${pref.nvoice===id?'selected':''}>${nm}</option>`).join('')}</select></div>
+      <p class="small" id="nvStatus" aria-live="polite"></p>
+      <div class="vrow"><label for="voiceSel">Device voice</label><select id="voiceSel"></select></div>
       <div class="vrow"><label for="rate">Speed</label><input type="range" id="rate" min="0.7" max="1.1" step="0.05"><span id="rateVal" style="min-width:3.2em;font-variant-numeric:tabular-nums"></span></div>
       <div class="btnrow" style="justify-content:flex-start"><button class="secondary" id="testVoice">Test English</button><button class="secondary" id="testZh">Test 中文</button><button class="secondary" id="testEs">Test Español</button></div>
       <p class="small">Chinese voice: <b>${vz?esc(vz.name):'none on this device'}</b>. Spanish voice: <b>${ve?esc(ve.name):'none on this device'}</b>.</p>
@@ -332,7 +339,17 @@ function grown(){
   $('#voiceSel').onchange=e=>{pref.name=e.target.value;voice=voices.find(v=>v.name===pref.name)||voice;savePref();testV()};
   const r=$('#rate');r.value=pref.rate;$('#rateVal').textContent=pref.rate.toFixed(2)+'×';
   r.oninput=()=>{pref.rate=+r.value;$('#rateVal').textContent=pref.rate.toFixed(2)+'×';savePref()};
-  const testV=()=>say(['Hi!',400,'The rabbit dug a burrow under the ground.',900,'Is the word burrow used the right way?']);
+  const SAMPLE=['Hi!',400,'The rabbit dug a burrow under the ground.',900,'Is the word burrow used the right way?',900,'What letter makes this sound?',700,'sss',600,'sss',800,'Like sun.'];
+  // the sample always waits for the natural voice, so a grown-up hears the real thing
+  const testV=()=>{if(!nvOn()){say(SAMPLE);return}const s=$('#nvStatus');s.textContent='Getting the sample ready… (a few seconds the first time)';
+    Promise.all(nvText(SAMPLE).map(t=>nvAudio(t,0))).then(()=>{nvShow();say(SAMPLE)},()=>{nvShow();say(SAMPLE)})};
+  const nvShow=()=>{const s=$('#nvStatus');if(!s)return;$('#nvRow').hidden=!pref.natural;
+    s.textContent=!pref.natural?'':NV.state==='loading'?`Downloading the natural voice… ${NV.pct}%`:NV.state==='ready'?'Natural voice is ready. Tap “Test English” to hear it.'
+      :NV.state==='failed'?"The natural voice couldn't load on this device, so the device voice is used. Check the internet connection and try again."
+      :nvCrashed()?"Last time the natural voice didn't finish loading, so it wasn't started automatically. Turn it off and on to try again.":''};
+  NV.onchange=nvShow;nvShow();
+  $('#nvOn').onchange=e=>{pref.natural=e.target.checked;savePref();if(pref.natural){store.del('mkha_nv_trying');if(NV.state==='failed')NV.state='off';nvLoad();nvWarm();nvPump()}else nvStop();nvShow()};
+  $('#nvSel').onchange=e=>{pref.nvoice=e.target.value;savePref();if(nvOn())testV()};
   $('#testVoice').onclick=testV;
   $('#testZh').onclick=()=>say([{t:'你好！我是熊猫。',lang:'zh'}]);
   $('#testEs').onclick=()=>say([{t:'¡Hola! Me gusta el perro.',lang:'es'}]);
