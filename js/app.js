@@ -18,7 +18,8 @@ function welcome(){
     <p class="small" style="font-size:1rem">Learning Lab is tap-to-answer practice. Everything is read aloud, and your child answers by tapping. Progress stays on this device. Nothing is sent anywhere.</p>
     <label class="field"><span>Child's first name or nickname <i>(optional)</i></span><input id="nm" maxlength="30" autocomplete="off" autocapitalize="words" spellcheck="false"></label>
     <div class="btnrow left"><button class="primary" id="go1">Next →</button></div>
-    <p class="small">Next, hand the device to your child to pick what they like best.</p></div></div>`;
+    <p class="small">Next, hand the device to your child to pick what they like best.</p>
+    <p class="small">New here? Read the ${extLink(GUIDE_URL,'3-step guide')}. Later, find it under <b>For grown-ups</b>.</p></div></div>`;
   const nm=$('#nm');nm.focus();nm.onkeydown=e=>{if(e.key==='Enter')$('#go1').click()};
   $('#go1').onclick=()=>{const p=addProfile(nm.value);loadProfile(p.id);pickTheme(p,home)};
 }
@@ -278,7 +279,10 @@ const stdLine=s=>{if(/^(Unit|World)/.test(s.std))return s.std;
   const cc=s.cc?` · ${/^K-[A-Z]/.test(s.cc)?'NGSS':'Common Core'} ${s.cc}`:'';return `Indiana ${s.std}${cc}`};
 const fmtDate=iso=>{const [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})};
 const caseLabel=l=>P.lcase==='upper'?l.toUpperCase():P.lcase==='lower'?l:l.toUpperCase()+l;
-const FEEDBACK_URL='https://github.com/ZhaoSerrano/my-kid-has-adhd/issues/new?template=parent-feedback.yml';
+// Links for grown-ups only (never on kid screens). They open in a new tab so the app stays put.
+const REPO_URL='https://github.com/ZhaoSerrano/my-kid-has-adhd',GUIDE_URL=REPO_URL+'#use-it-in-3-steps',TEST_GUIDE_URL=REPO_URL+'#add-your-kids-test-in-3-steps';
+const FEEDBACK_URL=REPO_URL+'/issues/new?template=parent-feedback.yml';
+const extLink=(url,text)=>`<a href="${url}" target="_blank" rel="noopener">${text}</a>`;
 function twoTap(btn,msg,fn){let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent=msg;return}fn()}}
 function grown(){
   setHeader('For grown-ups',home);const me=P.meta,idx=PROFILES.findIndex(p=>p.id===P.id);
@@ -289,6 +293,7 @@ function grown(){
   const hidden=hiddenUnits(),who=u=>!u.for?'All kids':(PROFILES.find(p=>p.id===u.for)||{}).name||'One child';
   const vz=voiceFor('zh'),ve=voiceFor('es');
   view.innerHTML=`<div class="col">
+    <nav class="linkrow" aria-label="Guide">📖 ${extLink(GUIDE_URL,'How to use it')}<span>·</span>${extLink(TEST_GUIDE_URL,'How to add a test')}<span>·</span>${extLink(REPO_URL,'Project on GitHub')}</nav>
     <div class="panel"><h2>Child</h2>
       <label class="field"><span>Name (optional, stays on this device)</span><input id="kidName" maxlength="30" autocomplete="off" value="${esc(me.name||'')}"></label>
       <div><span class="small">Favorite things (pictures in math and the robot game)</span>
@@ -383,6 +388,7 @@ function addTest(){
         <li><b>Take a photo</b> of the teacher's study guide.</li>
         <li><b>Copy the AI prompt</b> and paste it into Claude, ChatGPT or Gemini. Attach the photo and send.</li>
         <li><b>Copy the AI's whole answer</b> and paste it in the box below.</li></ol>
+      <p class="small">Stuck? See the ${extLink(TEST_GUIDE_URL,'step-by-step guide')}.</p>
       <div class="btnrow left"><button class="primary" id="copyP">Copy the AI prompt</button></div>
       <p class="small" id="copyMsg" aria-live="polite"></p>
       <details id="promptBox"><summary class="small">Show the prompt</summary><textarea readonly class="code" id="promptTxt" rows="10">${esc(prompt)}</textarea></details>
