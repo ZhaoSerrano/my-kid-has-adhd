@@ -5,9 +5,14 @@ $('#backBtn').onclick=()=>{hush();backFn&&backFn()};
 const speakName=s=>s.replace(/&/g,'and');
 
 function start(){loadProfiles();if(pref.natural&&!nvCrashed())nvLoad();
-  if(!PROFILES.length){welcome();return}
-  if(PROFILES.length===1){enter(PROFILES[0]);return}
-  picker()}
+  const go=()=>{if(!PROFILES.length){welcome();return}if(PROFILES.length===1){enter(PROFILES[0]);return}picker()};
+  splash(go)}
+// One big first tap: it says "start here", and it wakes up the voice (browsers stay silent until a tap).
+function splash(next){
+  setHeader('');const p=PROFILES.length===1?PROFILES[0]:null,pic=p&&p.theme?THEMES[p.theme].pic:'🎈';
+  view.innerHTML=`<div class="splash"><div class="splashpic">${pic}</div><h1>${p&&p.name?`Hi, ${esc(p.name)}!`:'Wiggle &amp; Win'}</h1>
+    <button class="playbig" id="go">▶ Let's play!</button></div>`;
+  $('#go').onclick=next}
 function enter(p){loadProfile(p.id);p.theme?home():pickTheme(p,home)}
 
 /* ---- profiles: first run, theme picker, who's playing ---- */
@@ -43,25 +48,44 @@ function picker(){
   $('#addKid').onclick=welcome;
 }
 
+/* Home is Today's Adventure: 3 stops and one big Play button. Everything else is one level down. */
 function home(){
   const nm=kidName();setHeader(nm?`${nm}'s Wiggle & Win`:'Wiggle & Win',PROFILES.length>1?picker:null);
-  const units=visibleUnits();
+  const T=today(),fin=T.i>=T.stops.length,hero=theme().hero,stk=P.stickers||[];
+  const trail=T.stops.map((s,k)=>`<li class="stop ${k<T.i?'done':k===T.i?'now':''}">${k===T.i?`<span class="me" aria-hidden="true">${hero[0]}</span>`:''}
+    <span class="bub">${k<T.i?'✓':s.pic}</span><b>${esc(s.title)}</b><small>${esc(stopLabel(s))}</small></li>`).join('');
+  view.innerHTML=`<div class="col">
+    <section class="adventure"><h2>${fin?'Adventure done! 🎉':"Today's adventure"}</h2><ol class="trail">${trail}</ol>
+      ${fin?'<p class="sub">Come back tomorrow for a new one.</p>':''}
+      <button class="playbig" id="play">${fin?'🎨 Choose a game':`▶ Play`}</button></section>
+    ${fin?'':'<button class="secondary pick" id="pick">🎨 Choose a game</button>'}
+    ${stk.length?`<div class="stickers" aria-label="my stickers"><b>My stickers</b><span>${stk.slice(-12).join('')}</span></div>`:''}
+    <button class="grownbtn" id="grownBtn">For grown-ups: progress, tests &amp; settings</button>
+  </div>`;
+  $('#play').onclick=fin?pickGame:runStop;if(!fin)$('#pick').onclick=pickGame;$('#grownBtn').onclick=grown;
+  const hi=nm?`Hi, ${nm}!`:'Hi!';
+  say(fin?[hi,300,'You finished today\'s adventure!',400,'You can choose a game, or come back tomorrow.']
+    :[hi,300,T.i===0?"Let's start today's adventure.":`Next stop: ${T.stops[T.i].title}.`,400,'Tap Play.']);
+  nvWarm();
+}
+function runStop(){const T=today(),s=T.stops[T.i];if(!s){home();return}const {list,ctx}=stopSet(s);
+  runRound(s.title,()=>makeSet(list,ctx),home,{stop:T.i})}
+// Pick your own: tests and subjects, one level below the adventure
+function pickGame(){
+  setHeader('Choose a game',home);const units=visibleUnits();
   const tiles=g=>Object.entries(SUBJECTS).filter(([,s])=>s.group===g).map(([k,s])=>`<button class="subj" style="--h:${s.h}" data-s="${k}"><span class="pic">${s.pic}</span><b>${s.name}</b></button>`).join('');
   view.innerHTML=`<div class="col">
     ${units.map(u=>`<button class="banner" data-u="${u.id}"><span class="pic">📝</span><span><small>${countdown(u)}</small><b>${esc(u.title)}</b></span></button>`).join('')}
     <div class="subjects">${tiles('school')}</div>
     <p class="grouplabel">More to explore</p>
     <div class="subjects four">${tiles('more')}</div>
-    <button class="grownbtn" id="grownBtn">For grown-ups: progress, tests &amp; settings</button>
   </div>`;
   view.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>unitHome(allUnits().find(u=>u.id===b.dataset.u)));
   view.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>subject(b.dataset.s));
-  $('#grownBtn').onclick=grown;
-  nvWarm();
 }
 function subject(sub){
   const S=SUBJECTS[sub],ids=Object.keys(SKILLS).filter(id=>SKILLS[id].sub===sub&&!SKILLS[id].unitOnly);
-  setHeader(S.name,home);
+  setHeader(S.name,pickGame);
   view.innerHTML=`<div class="col">
     <button class="mix" style="--h:${S.h}" id="mix">▶ Play a mix</button>
     <div class="menu">${S.lang?`<button class="tile" data-x="cards"><span class="pic">🃏</span><b>Word cards</b><small>Hear every word</small></button>`:''}
@@ -76,8 +100,8 @@ function langDeck(lg){const L=LANG[lg];return Object.values(L.cats).flatMap(c=>c
   word:`<div class="foreign" lang="${L.tag}">${it[0]}</div>${it[3]?`<div class="pinyin">${it[3]}</div>`:''}`,def:it[2],
   speak:[{t:it[0],lang:lg},700,it[2]+'.',700,{t:it[0],lang:lg}]})))}
 function unitHome(u){
-  if(!u){home();return}
-  setHeader(u.title,home);const ctx=unitCtx(u),secs=unitSections(u),words=u.words||[];
+  if(!u){pickGame();return}
+  setHeader(u.title,pickGame);const ctx=unitCtx(u),secs=unitSections(u),words=u.words||[];
   view.innerHTML=`<div class="col"><p class="sub" style="text-align:center">${countdown(u)}</p><div class="menu">
       ${words.length?`<button class="tile" data-x="cards"><span class="pic">🃏</span><b>Word cards</b><small>Learn the ${words.length} words</small></button>`:''}
       ${secs.map(([id,t,d,pic])=>`<button class="tile" data-k="${id}"><i class="dot ${mastery(id).lvl}"></i><span class="pic">${pic}</span><b>${esc(t)}</b><small>${esc(d)}</small></button>`).join('')}
@@ -102,7 +126,8 @@ function deck(title,items,i,back){
 /* ================= round runner ================= */
 let R=null,roundsDone=0;
 const MAX_EXTRAS=2;
-function runRound(title,make,back){hush();R={title,make,back,qs:make(),i:0,res:[],extras:0};R.qs.forEach(q=>nvPrefetch(q.prompt));showQ()}
+// opts.stop: index of today's adventure stop this round belongs to (absent for games picked by hand)
+function runRound(title,make,back,opts={}){hush();R={title,make,back,opts,qs:make(),i:0,res:[],extras:0};R.qs.forEach(q=>nvPrefetch(q.prompt));showQ()}
 // A missed question comes back once at the end of the round, reshuffled (at most MAX_EXTRAS per round).
 function requeue(q){if(q.again||q.mode==='robot'||R.extras>=MAX_EXTRAS)return;R.extras++;
   R.qs.push(Object.assign({},q,{again:true,key:q.key+'#again',options:q.options&&shuffle(q.options),prompt:["Let's try this one again.",500,...q.prompt]}))}
@@ -140,18 +165,45 @@ function showQ(){
 function nextQ(){R.i++;R.i<R.qs.length?showQ():done()}
 const WIGGLES=[['🦘','Jump 5 times!'],['🙆','Touch your toes 5 times.'],['🌳','Stretch up tall like a tree.'],['🐸','Hop like a frog 3 times.'],['👏','Clap your hands 10 times.'],
   ['🦩','Stand on one foot like a flamingo. Count to 5.'],['🏃','Run in place. Count to 10.'],['🐻','Give yourself a big bear hug.'],['🌬️','Take 3 slow, deep breaths.'],['🙌','Reach up high, then touch the floor. Do it 3 times.']];
+/* End of a round: celebrate, then point forward. The big button is always the next new thing;
+   "Play again" is small, because doing the same thing again is not what keeps a kid learning. */
 function done(){
   const got=R.res.filter(Boolean).length,n=R.qs.length;setHeader(R.title,R.back);roundsDone++;
+  const skills=[...new Set(R.qs.filter(q=>!q.again).map(q=>q.skill))];
+  // a round that's part of today's adventure moves the adventure forward
+  let next=null,label='',T=null;
+  if(R.opts.stop!=null){T=today();if(T.i===R.opts.stop){T.did=[...new Set([...T.did,...skills])];T.i++;saveP()}
+    if(T.i>=T.stops.length){recap(got,n);return}
+    const s=T.stops[T.i];label=`Next: ${s.title}`;next=runStop;
+  }else{T=today();
+    if(T.i<T.stops.length){label="Back to today's adventure";next=home}
+    else{const id=suggestNew(skills[0]);if(id){label=`Try something new: ${SKILLS[id].kid}`;next=()=>runRound(SKILLS[id].kid,()=>makeSet(Array(SKILLS[id].n||5).fill(id),{}),pickGame)}}}
   const wig=roundsDone%2===0?one(WIGGLES):null;
-  view.innerHTML=`<div class="col"><div class="stage done"><h1>All done!</h1>
+  const cheer=got===n?'Wow! All the stars!':got>=n/2?'You did great!':'Good effort! You are learning.';
+  view.innerHTML=`<div class="col"><div class="stage done"><h1>${cheer}</h1>
     <div class="row">${R.res.map(r=>STAR.replace('<svg',`<svg class="${r?'':'off'}"`)).join('')}</div>
-    <p class="sub" style="font-size:1.15rem">${got} of ${n} on the first try</p>
-    <div class="btnrow"><button class="primary" id="again">Play again</button><button class="secondary" id="back2">Done</button></div></div>
-    ${wig?`<div class="wiggle" id="wig"><div class="bigpic">${wig[0]}</div><h2>Wiggle break!</h2><p>${wig[1]}</p><button class="go" id="did">I did it!</button></div>`:''}</div>`;
-  const cheer=got===n?'Wow! All the stars! Great job.':`Great work! You got ${got} ${got===1?'star':'stars'}.`;
-  say(wig?[cheer,800,'Wiggle break!',400,wig[1]]:cheer);
-  if(wig)$('#did').onclick=()=>{$('#wig').innerHTML='<div class="bigpic">🎉</div><h2>Great moving!</h2>';say('Great moving! Your body is ready to learn.')};
-  $('#again').onclick=()=>runRound(R.title,R.make,R.back);$('#back2').onclick=()=>{hush();R.back()};
+    ${wig?`<div class="wiggle" id="wig"><div class="bigpic">${wig[0]}</div><h2>Wiggle break!</h2><p>${wig[1]}</p><button class="go" id="did">I did it!</button></div>`:''}
+    ${next?`<button class="playbig" id="next">${esc(label)} →</button>`:`<button class="playbig" id="next">Done ✓</button>`}
+    <div class="btnrow"><button class="secondary sm" id="again">↻ Play again</button>${R.opts.stop!=null||!next?'':`<button class="secondary sm" id="back2">Done</button>`}</div></div></div>`;
+  const forward=next?(label.startsWith('Next')?[label+'!']:['Want to try something new?',300,'Tap the big button.']):[];
+  say(wig?[cheer,600,'Wiggle break!',400,wig[1]]:[cheer,500,...forward]);
+  if(wig)$('#did').onclick=()=>{$('#wig').innerHTML='<div class="bigpic">🎉</div><h2>Great moving!</h2>';say(['Great moving!',400,...forward])};
+  $('#next').onclick=()=>{hush();(next||R.back)()};
+  $('#again').onclick=()=>runRound(R.title,R.make,R.back,R.opts);
+  if($('#back2'))$('#back2').onclick=()=>{hush();R.back()};
+}
+// The end of today's adventure: what they practiced, a sticker, and a clear stop.
+function recap(got,n){
+  const T=today(),st=newSticker(),names=T.did.filter(id=>SKILLS[id]).map(id=>SKILLS[id]);
+  setHeader("Today's adventure",home);
+  view.innerHTML=`<div class="col"><div class="stage done recap"><h1>You finished today's adventure!</h1>
+    <div class="sticker" aria-label="new sticker">${st}</div><p class="sub">New sticker!</p>
+    ${names.length?`<div class="learned"><b>Today you practiced</b><ul>${names.map(s=>`<li><span>${s.pic}</span>${esc(s.kid)}</li>`).join('')}</ul></div>`:''}
+    <button class="playbig" id="bye">See you tomorrow! 👋</button>
+    <div class="btnrow"><button class="secondary sm" id="more">🎨 Keep playing</button></div></div></div>`;
+  const list=names.map(s=>s.kid.toLowerCase());
+  say(['Hooray!',300,"You finished today's adventure!",500,...(list.length?[`Today you practiced ${andList(list)}.`,500]:[]),'You earned a new sticker!']);
+  $('#bye').onclick=()=>{hush();home()};$('#more').onclick=()=>{hush();pickGame()};
 }
 
 const hearBtn=`<button class="listen" id="hear">${SPK} Hear it again</button>`;
@@ -327,6 +379,7 @@ function grown(){
       <div class="vrow" id="nvRow"><label for="nvSel">Natural voice</label><select id="nvSel">${NV_VOICES.map(([id,nm])=>`<option value="${id}" ${pref.nvoice===id?'selected':''}>${nm}</option>`).join('')}</select></div>
       <p class="small" id="nvStatus" aria-live="polite"></p>
       <div class="vrow"><label for="voiceSel">Device voice</label><select id="voiceSel"></select></div>
+      <p class="small" id="voiceCheck" aria-live="polite"></p>
       <div class="vrow"><label for="rate">Speed</label><input type="range" id="rate" min="0.7" max="1.1" step="0.05"><span id="rateVal" style="min-width:3.2em;font-variant-numeric:tabular-nums"></span></div>
       <div class="btnrow" style="justify-content:flex-start"><button class="secondary" id="testVoice">Test English</button><button class="secondary" id="testZh">Test 中文</button><button class="secondary" id="testEs">Test Español</button></div>
       <p class="small">Chinese voice: <b>${vz?esc(vz.name):'none on this device'}</b>. Spanish voice: <b>${ve?esc(ve.name):'none on this device'}</b>.</p>
@@ -368,6 +421,11 @@ function grown(){
       :NV.state==='failed'?"The natural voice couldn't load on this device, so the device voice is used. Check the internet connection and try again."
       :nvCrashed()?"Last time the natural voice didn't finish loading, so it wasn't started automatically. Turn it off and on to try again.":''};
   NV.onchange=nvShow;nvShow();
+  // Is the device voice really talking in this browser? Tells a grown-up what to do when it isn't.
+  const vcShow=()=>{const e=$('#voiceCheck');if(!e)return;
+    e.innerHTML=voiceHealth.last==='stuck'?"⚠️ <b>The device voice isn't responding in this browser.</b> Quit the browser completely and reopen it, or turn on <b>Natural voice</b> above, which plays a different way."
+      :voiceHealth.ok?'✓ The device voice is working.':'Tap <b>Test English</b> to check the voice.'};
+  vcShow();$('#testVoice').addEventListener('click',()=>setTimeout(vcShow,4000));
   $('#nvOn').onchange=e=>{pref.natural=e.target.checked;savePref();if(pref.natural){store.del('mkha_nv_trying');if(NV.state==='failed')NV.state='off';nvLoad();nvWarm();nvPump()}else nvStop();nvShow()};
   $('#nvSel').onchange=e=>{pref.nvoice=e.target.value;savePref();if(nvOn())testV()};
   $('#testVoice').onclick=testV;

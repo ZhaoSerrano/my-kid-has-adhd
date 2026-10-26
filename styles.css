@@ -237,6 +237,32 @@ details summary.small{cursor:pointer}
 .worklist{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px;line-height:1.4}
 .showbox{font:700 2.2rem/1.2 var(--f-read);text-align:center;max-width:100%;overflow-wrap:anywhere}
 .anstext{font:700 1.6rem var(--f-read);text-align:center;overflow-wrap:anywhere}
+/* start screen, today's adventure, recap */
+.splash{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+.splashpic{font-size:6rem;line-height:1}
+.playbig{border:0;border-radius:24px;padding:20px 36px;min-height:72px;font:700 1.6rem var(--f-ui);color:#fff;cursor:pointer;
+  background:linear-gradient(180deg,#4FC27F,var(--yes));box-shadow:0 6px 0 #1E7A50;align-self:stretch;max-width:520px;margin:0 auto;width:100%}
+.playbig:active{transform:translateY(3px);box-shadow:0 3px 0 #1E7A50}
+.adventure{background:var(--card);border:2px solid var(--edge);border-radius:24px;padding:18px 16px 20px;display:flex;flex-direction:column;gap:16px;text-align:center}
+.trail{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:relative}
+.trail::before{content:"";position:absolute;top:66px;left:16%;right:16%;border-top:4px dashed var(--edge)}
+.stop{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:38px}
+.stop .bub{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:1.8rem;background:var(--paper);border:3px solid var(--edge)}
+.stop b{font-size:.95rem;line-height:1.15}
+.stop small{color:var(--muted);font-size:.78rem;line-height:1.2}
+.stop.now .bub{border-color:var(--yes);box-shadow:0 0 0 5px var(--yes-bg);transform:scale(1.1)}
+.stop.done .bub{background:var(--yes);border-color:var(--yes);color:#fff;font-weight:700}
+.stop .me{position:absolute;top:0;font-size:1.7rem;line-height:1;z-index:1;animation:bob 1.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.pick{align-self:center}
+.stickers{display:flex;flex-direction:column;align-items:center;gap:4px}
+.stickers b{font-size:.85rem;color:var(--muted)}
+.stickers span{font-size:1.8rem;letter-spacing:4px}
+.recap .sticker{font-size:5rem;line-height:1;animation:pop .6s}
+.learned{background:var(--paper);border-radius:16px;padding:12px 16px;width:100%;box-sizing:border-box}
+.learned ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;font:600 1.1rem var(--f-read)}
+.learned li span{margin-right:8px}
+@media (prefers-reduced-motion:reduce){.stop .me,.recap .sticker{animation:none}}
 /* wiggle break */
 .wiggle{background:var(--math-bg);border:2px solid var(--math);border-radius:24px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
 .wiggle p{font-family:var(--f-read);font-size:1.35rem;margin:0}

@@ -35,6 +35,7 @@ Ship the 80/20 version, put it in front of parents, and iterate on their feedbac
 | `js/core.js` | Helpers, profile and progress storage (`P`, `record`, `mastery`), speech (`say`, `hush`, `voiceFor`) |
 | `js/skills.js` | Question generators `g*()`, Web Audio for music, `SKILLS` registry, `SUBJECTS`, `MIXN`, `makeQ`, `makeSet`, `mixList` |
 | `js/units.js` | Units (tests): `EXAMPLE_UNIT` (kindergarten "Unit 3 Reading Test"), storage, `unitCtx`, `unitSections`, `unitTest`, the AI prompt `aiPrompt()`, and `parseUnit()` validation |
+| `js/path.js` | Today's Adventure: picks the day's 3 stops (`buildToday`, `today`, `stopSet`), stickers, "try something new" suggestions |
 | `js/app.js` | Profiles (welcome, theme picker, who's playing), navigation/screens, round runner with explanations and retries, wiggle breaks, `MOUNTS` (`choose`, `sequence`, `robot`, `trace`, `debug`), grown-up screen, Add a test, `start()` |
 
 ### Question object contract (returned by every generator)
@@ -62,6 +63,17 @@ Optional question fields: `whyText` (screen text when it differs from the spoken
 - `u3voice` holds voice preferences (`name`, `rate`, `natural`, `nvoice`).
 - `mkha_appearance` = `"light"` or `"dark"` (JSON-encoded; absent = Auto, follows the device). A small inline script in `index.html` sets `data-theme` on `<html>` before the page draws.
 - Natural voice: generated lines are saved in IndexedDB `mkha-voice` (store `clips`, Int16 audio, key `voice|rate|text`); `mkha_nv_keys` lists them oldest first (newest 800 kept). `mkha_nv_trying` is set while the model loads, so a crash during loading (an older iPad out of memory) doesn't auto-retry on the next start.
+
+### Guided path (`js/path.js`, added Oct 26, 2026)
+- Home is **Today's Adventure**: 3 stops a day (Warm-up = missed/weak skills for spaced retrieval; Test practice if a test is coming, else Practice; Something new = next untried skill in `PATH_ORDER`). One big Play button; subjects live under "Choose a game" (`pickGame`). State: `P.today`, stickers in `P.stickers`.
+- End of a round: big button = next stop / "Try something new"; "Play again" is small. End of the day: recap ("Today you practiced…") + a theme sticker + "See you tomorrow".
+- Based on: Khan Academy Kids (one Play button into a path), Duolingo ABC (linear path), ADHD guidance (one step at a time, immediate rewards), spaced-retrieval research, Reading Eggs/Bitsboard end-of-session rewards.
+
+### Speech gotchas (learned the hard way, Oct 26, 2026)
+- Browsers block speech until a tap. The app opens on a "▶ Let's play!" splash; `unlockAudio()` runs on the first tap and replays anything said before it.
+- iPad Safari needs the first speech *inside* the tap: `unlockAudio` speaks an empty, silent line on iOS only.
+- **Never speak a whitespace-only line on desktop.** After one, Chrome and the app's own browser on macOS stopped speaking entirely (lines queued, never started) until the browser restarted. Rapid speak/cancel loops in automated tests may also wedge it, so don't hammer speech in tests.
+- `deviceSpeak` has a watchdog: a line that hasn't started in 1.5 s gets a `cancel()` and one retry. `voiceHealth` feeds the grown-up "voice check" line.
 
 ### Natural voice (optional, in `js/core.js`)
 - Kokoro-82M via `kokoro-js@1.2.1` (Apache 2.0), q8 on WASM (~92 MB model, cached by the browser). WebGPU with q8 tested about 4× slower, so it isn't used.

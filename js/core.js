@@ -29,7 +29,7 @@ function saveProfiles(){store.set('mkha_profiles',PROFILES)}
 function addProfile(name){const p={id:'k'+Date.now().toString(36)+rnd(10,99),name:(name||'').trim().slice(0,30),theme:''};PROFILES.push(p);saveProfiles();return p}
 function removeProfile(id){PROFILES=PROFILES.filter(p=>p.id!==id);saveProfiles();store.del('lab_'+id);if(store.get('mkha_last','')===id)store.del('mkha_last')}
 // lcase: how letters are shown in letter sounds, find the letter and tracing: 'lower', 'upper' or 'both' (random each question)
-const freshProgress=()=>({stars:0,skills:{},items:{},letters:ALPHA.slice(),lcase:'both',maxCount:10,robotLevel:0});
+const freshProgress=()=>({stars:0,skills:{},items:{},letters:ALPHA.slice(),lcase:'both',maxCount:10,robotLevel:0,stickers:[],today:null});
 const upperNow=()=>P.lcase==='upper'?true:P.lcase==='lower'?false:Math.random()<.5;
 function loadProfile(id){
   const d=store.get('lab_'+id,{});
@@ -155,8 +155,21 @@ function nvPlay(d,cb){const a=typeof ac==='function'&&ac();if(!a){cb(false);retu
     s.onended=fin;s.start();setTimeout(fin,b.duration*1000+800)}catch(e){cb(false)}}
 function nvStop(){if(NV.src){try{NV.src.stop()}catch(e){}NV.src=null}}
 
+/* Browsers stay silent until a real tap, and iPad Safari also needs the first speech to start inside that tap
+   (everything else here starts a moment later, on a timer). So the first tap anywhere speaks a silent line and
+   wakes the audio, and whatever the app tried to say before that is said right after, unless something newer came first. */
+let audioUnlocked=false,pendingSay=null;
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+function unlockAudio(){if(audioUnlocked)return;audioUnlocked=true;
+  // only iPad/iPhone need a silent line inside the tap; desktop Chrome just needs the tap itself
+  if(isIOS)try{if(synth){const u=new SpeechSynthesisUtterance('');u.volume=0;synth.speak(u)}}catch(e){}
+  try{typeof ac==='function'&&ac()}catch(e){}
+  const p=pendingSay;if(p)setTimeout(()=>{if(pendingSay===p&&sayId===p.at){pendingSay=null;say(p.parts,p.done)}},250)}
+['pointerup','touchend','click','keydown'].forEach(t=>document.addEventListener(t,unlockAudio,{capture:true}));
+
 let sayId=0;
 function say(parts,done){
+  if(!audioUnlocked){pendingSay={parts,done,at:sayId};return}
   const id=++sayId,list=Array.isArray(parts)?parts:[parts];
   if(synth)try{synth.cancel()}catch(e){}nvStop();
   let i=0,nat=false;
@@ -172,7 +185,7 @@ function say(parts,done){
   let started=false;const go=()=>{if(started||id!==sayId)return;started=true;if(!nat)lines.forEach(t=>nvAudio(t,1));step()};
   Promise.all(lines.map(nvHas)).then(r=>{nat=r.every(Boolean);go()},go);setTimeout(go,400);
 }
-function hush(){sayId++;if(synth)try{synth.cancel()}catch(e){}nvStop()}
+function hush(){sayId++;pendingSay=null;if(synth)try{synth.cancel()}catch(e){}nvStop()}
 function voiceFor(lang){const pre=lang==='zh'?/^zh[-_](CN|Hans)/i:/^es[-_](US|MX|419)/i,any=lang==='zh'?/^(zh|cmn)/i:/^es/i;
   const sc=v=>(/natural|neural|premium|enhanced|online/i.test(v.name)?100:0)+(pre.test(v.lang)?30:0)-(NOVELTY.test(v.name)?200:0);
   return allVoices.filter(v=>any.test(v.lang)).sort((a,b)=>sc(b)-sc(a))[0]||null}
@@ -184,13 +197,22 @@ function speakOne(text,cb,lang,nat){
       ()=>{if(fell)return;clearTimeout(late);deviceSpeak(text,cb,lang)});
     return}
   deviceSpeak(text,cb,lang)}
-function deviceSpeak(text,cb,lang){
+// Is the device voice actually talking? ok = lines that started; stuck = lines that never started even after a reset.
+const voiceHealth={ok:0,stuck:0,last:''};
+function deviceSpeak(text,cb,lang,retry){
   if(!synth){cb();return}
   try{const u=new SpeechSynthesisUtterance(text),v=lang?voiceFor(lang):voice;u.rate=pref.rate*(lang?.85:1);u.pitch=1;
     if(v){u.voice=v;u.lang=v.lang}else u.lang=lang==='zh'?'zh-CN':lang==='es'?'es-MX':'en-US';
-    let fired=false;const fin=()=>{if(!fired){fired=true;clearTimeout(t);cb()}};
-    u.onend=fin;u.onerror=fin;synth.speak(u);
+    let fired=false,started=false;const fin=()=>{if(!fired){fired=true;clearTimeout(t);clearTimeout(kick);cb()}};
+    u.onstart=()=>{started=true;voiceHealth.ok++;voiceHealth.last='ok'};u.onend=fin;u.onerror=fin;
+    try{if(synth.paused)synth.resume()}catch(e){}
+    synth.speak(u);
     const t=setTimeout(fin,2500+text.length*110/pref.rate);
+    // Chrome sometimes queues a line and never starts it, and then nothing after it plays either.
+    // If this line hasn't started in 1.5 s, reset the speech engine and try it once more.
+    const kick=setTimeout(()=>{if(started||fired)return;fired=true;clearTimeout(t);try{synth.cancel()}catch(e){}
+      if(retry){voiceHealth.stuck++;voiceHealth.last='stuck';cb();return}
+      setTimeout(()=>deviceSpeak(text,cb,lang,true),120)},1500);
   }catch(e){cb()}
 }
 const sentences=s=>s.split(/(?<=[.!?])\s+/).flatMap((x,k,a)=>k<a.length-1?[x,550]:[x]);
