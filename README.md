@@ -51,7 +51,7 @@ We kept the design close to what research supports, and we're careful not to ove
 
 ## Feedback
 
-Did it help your kid on a test? What should change? Open an [issue on GitHub](https://github.com/ZhaoSerrano/my-kid-has-adhd/issues). We especially want to hear from parents.
+Did it help your kid on a test? Did they choose to play? What should change? Fill in the 2-minute **[parent feedback form](https://github.com/ZhaoSerrano/my-kid-has-adhd/issues/new?template=parent-feedback.yml)** (also linked from the app's grown-up screen). It's public, so leave out your child's name and other private details. Developers can open a regular [issue](https://github.com/ZhaoSerrano/my-kid-has-adhd/issues) or see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## For developers
 
@@ -59,4 +59,4 @@ It's a static site: plain HTML, CSS and JavaScript, with no build step and no ba
 
 ## License
 
-Code: [MIT](LICENSE). Content (questions, stories, explanations, word lists): [CC BY 4.0](LICENSE-CONTENT.md). The optional natural voice uses [kokoro-js](https://github.com/hexgrad/kokoro) and the Kokoro-82M model, both Apache 2.0, loaded from a CDN, not bundled here.
+Copyright © 2026 Qianyu Zhao-Serrano. Code: [MIT](LICENSE). Content (questions, stories, explanations, word lists): [CC BY 4.0](LICENSE-CONTENT.md). The optional natural voice uses [kokoro-js](https://github.com/hexgrad/kokoro) and the Kokoro-82M model, both Apache 2.0, loaded from a CDN, not bundled here.

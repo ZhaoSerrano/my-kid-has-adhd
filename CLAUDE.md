@@ -73,8 +73,9 @@ Optional question fields: `whyText` (screen text when it differs from the spoken
 - Mastery per skill (last 10 tries). "Play a mix" weights toward weak skills.
 - Child's name removed from the code.
 - **v1 tasks 1–8 done (Oct 26, 2026).** Profiles and theme picker; explanation panel with Next; rewritten `why`s; in-round retries and item boxes; themes in math, patterns and robot/debug; Add-a-test flow (`aiPrompt`, `parseUnit`, `unitSections`, `unitTest` in `js/units.js`); wiggle breaks; Common Core/NGSS codes (`cc` on `SKILLS`); README, PROMPT, LICENSE, CONTRIBUTING. Tested in the browser: ~11k generated questions, every subject mix, unit tests, and the grown-up screens with zero page errors, at 390×844 and 820×1180 in light and dark.
-- Licenses confirmed by the founder (Oct 26, 2026): MIT for code, CC BY 4.0 for content.
-- **Next:** task 9 (deploy) was approved Oct 26, 2026: push `main` to `github.com/ZhaoSerrano/my-kid-has-adhd`, then turn on GitHub Pages (main branch, root).
+- Licenses confirmed by the founder (Oct 26, 2026): MIT for code (`LICENSE`), CC BY 4.0 for content (`LICENSE-CONTENT.md`). Copyright holder: Qianyu Zhao-Serrano. CONTRIBUTING says contributions come in under the same licenses.
+- **Deployed (Oct 26, 2026):** public repo `github.com/ZhaoSerrano/my-kid-has-adhd`, GitHub Pages from `main` / root at https://zhaoserrano.github.io/my-kid-has-adhd/. Pushes are done by the founder from the Mac Terminal app (`git push`), where her GitHub login works.
+- Parent feedback: GitHub issue form `.github/ISSUE_TEMPLATE/parent-feedback.yml` (label `feedback`), linked from the grown-up screen (`FEEDBACK_URL` in `js/app.js`), README and CONTRIBUTING. It tracks the two numbers that matter: did the kid pass, and did the kid choose to play.
 
 ### v1 tasks (done except 9; kept for reference)
 1. **Profiles.**

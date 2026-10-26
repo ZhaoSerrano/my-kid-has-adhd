@@ -277,6 +277,7 @@ function fillVoiceSel(sel){
 const stdLine=s=>{if(/^(Unit|World)/.test(s.std))return s.std;
   const cc=s.cc?` · ${/^K-[A-Z]/.test(s.cc)?'NGSS':'Common Core'} ${s.cc}`:'';return `Indiana ${s.std}${cc}`};
 const fmtDate=iso=>{const [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})};
+const FEEDBACK_URL='https://github.com/ZhaoSerrano/my-kid-has-adhd/issues/new?template=parent-feedback.yml';
 function twoTap(btn,msg,fn){let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent=msg;return}fn()}}
 function grown(){
   setHeader('For grown-ups',home);const me=P.meta,idx=PROFILES.findIndex(p=>p.id===P.id);
@@ -322,6 +323,10 @@ function grown(){
       <div class="btnrow" style="justify-content:flex-start"><button class="secondary" id="testVoice">Test English</button><button class="secondary" id="testZh">Test 中文</button><button class="secondary" id="testEs">Test Español</button></div>
       <p class="small">Chinese voice: <b>${vz?esc(vz.name):'none on this device'}</b>. Spanish voice: <b>${ve?esc(ve.name):'none on this device'}</b>.</p>
       <p class="small">On iPhone or iPad, add better voices in Settings › Accessibility › Spoken Content › Voices. Pick English (Ava or Zoe Premium), Chinese, and Spanish, download them, then reopen this page.</p></div>
+    <div class="panel"><h2>Tell us how it went</h2>
+      <p class="small">Did it help on a test? Did your child choose to play? What should change? Your answers decide what we build next.</p>
+      <div class="btnrow left"><a class="primary" href="${FEEDBACK_URL}" target="_blank" rel="noopener">Give feedback</a></div>
+      <p class="small">Opens a short form on GitHub (a free account is needed). The form is public, so leave out your child's name and other private details.</p></div>
     <p class="small"><b>Privacy:</b> names, progress and tests are saved only in this browser on this device. Nothing is sent anywhere. Learning Lab is designed for kids with ADHD; it is practice, not a treatment.</p>
     <button class="secondary" id="reset" style="align-self:center">Reset ${esc(kidLabel(me,idx))}'s progress</button>
   </div>`;

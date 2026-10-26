@@ -4,6 +4,12 @@ Thanks for helping! Learning Lab is a static site: plain JavaScript, loaded with
 
 Run it locally by opening `index.html`, or with any static server, for example `python3 -m http.server`.
 
+**Not a developer?** Feedback from parents and teachers is the most useful help of all. Use the [parent feedback form](https://github.com/ZhaoSerrano/my-kid-has-adhd/issues/new?template=parent-feedback.yml). It's public, so leave out your child's name and other private details.
+
+## Licensing of contributions
+
+By contributing, you agree that your contribution is licensed under the same terms as the project: [MIT](LICENSE) for code and [CC BY 4.0](LICENSE-CONTENT.md) for content (questions, stories, explanations, word lists and tests). Only contribute work you wrote yourself or have the right to share under those licenses.
+
 ## Ground rules
 
 - **No child names** in code or content. Names come only from profiles saved on the device.

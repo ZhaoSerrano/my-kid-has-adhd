@@ -1,0 +1,72 @@
+name: Parent feedback
+description: Tell us how Learning Lab worked for your child. No coding needed; it takes about 2 minutes.
+title: "Parent feedback"
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for trying Learning Lab! 💛
+
+        **This page is public.** Please leave out your child's name, school, photos, diagnosis details or anything else private.
+  - type: dropdown
+    id: helped
+    attributes:
+      label: Did it help your child on a test?
+      options:
+        - "Yes"
+        - Somewhat
+        - "No"
+        - Too early to tell
+    validations:
+      required: true
+  - type: dropdown
+    id: chose
+    attributes:
+      label: Did your child choose to play?
+      options:
+        - Yes, often
+        - Sometimes
+        - Only when asked
+        - "No"
+    validations:
+      required: true
+  - type: dropdown
+    id: grade
+    attributes:
+      label: Grade
+      options:
+        - Pre-K
+        - Kindergarten
+        - 1st grade
+        - 2nd grade
+        - Other
+  - type: checkboxes
+    id: used
+    attributes:
+      label: What did you use? (check all that apply)
+      options:
+        - label: A test from my child's study guide (Add a test)
+        - label: The built-in subjects (Reading, Math, …)
+        - label: The natural voice
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options:
+        - iPad
+        - iPhone
+        - Android tablet or phone
+        - Computer
+        - Other
+  - type: textarea
+    id: worked
+    attributes:
+      label: What worked well?
+  - type: textarea
+    id: change
+    attributes:
+      label: What should change?
+      description: Anything that was confusing, too hard, too easy, boring, or broken.
+    validations:
+      required: true

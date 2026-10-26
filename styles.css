@@ -208,6 +208,7 @@ details.panel[open] summary h2::after{content:" －"}
 .themerow small{font-size:.72rem;color:var(--muted);text-align:center;line-height:1.15}
 .themerow button.on{border-color:var(--accent);background:var(--read-bg)}
 .btnrow.left{justify-content:flex-start}
+a.primary,a.secondary{display:inline-block;text-decoration:none}
 .switch{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:1.05rem}
 .switch input{width:22px;height:22px;accent-color:var(--accent);margin:0}
 .secondary.sm{padding:6px 12px;font-size:.9rem;border-radius:10px}
