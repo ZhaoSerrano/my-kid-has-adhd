@@ -2,7 +2,7 @@
 
 **Turn quiz prep into a game. Free, tap-to-answer practice built from your kid's actual study guide. Designed for kids with ADHD.**
 
-👉 **Open the app:** https://zhaoserrano.github.io/my-kid-has-adhd/
+👉 **Open the app:** https://wiggleandwin.com/ (or type **mykidhasadhd.com**, which goes to the same place)
 
 Inside the app, your child sees **Wiggle & Win™**, a name that's all about play and never mentions ADHD.
 
@@ -25,7 +25,7 @@ This isn't open-ended "study time." Kids with ADHD do best with a clear goal, a 
 
 ## Use it in 3 steps
 
-1. **Open the app** on a phone, tablet or computer: https://zhaoserrano.github.io/my-kid-has-adhd/. On an iPad or iPhone, tap Share → **Add to Home Screen** so it opens like an app.
+1. **Open the app** on a phone, tablet or computer: https://wiggleandwin.com/. On an iPad or iPhone, tap Share → **Add to Home Screen** so it opens like an app.
 2. **Type your child's name** (optional), then hand it over so they can pick what they like best.
 3. **Tap a subject, or the test banner at the top**, and play. Check **For grown-ups** to see what's solid and what needs practice.
 
