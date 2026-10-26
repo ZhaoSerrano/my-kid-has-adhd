@@ -1,0 +1,5 @@
+# Private founder notes (family details). Never commit.
+STORY.md
+private/
+.claude/
+.DS_Store
