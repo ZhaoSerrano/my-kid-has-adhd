@@ -1,11 +1,11 @@
 # The AI prompt for adding a test
 
-Copy everything inside the box below, paste it into Claude, ChatGPT or Gemini, attach a photo of the teacher's study guide, and send. Then paste the AI's answer into Learning Lab: **For grown-ups → Tests → + Add a test**.
+Copy everything inside the box below, paste it into Claude, ChatGPT or Gemini, attach a photo of the teacher's study guide, and send. Then paste the AI's answer into Wiggle & Win: **For grown-ups → Tests → + Add a test**.
 
 The app has a **Copy the AI prompt** button that copies this same text. It is built by `aiPrompt()` in `js/units.js`, so the skill list always matches the app. If you change skills, update this file from the app: open **Add a test → Show the prompt** and copy it here.
 
 ````text
-You are helping a parent turn their child's school study guide into practice for a free kids' learning app called Learning Lab. The child may have ADHD and may be a young or early reader, so everything is read aloud and answered by tapping a picture.
+You are helping a parent turn their child's school study guide into practice for a free kids' learning app called Wiggle & Win (My Kid Has ADHD: Quiz Prep). The child may have ADHD and may be a young or early reader, so everything is read aloud and answered by tapping a picture.
 
 I will attach a photo (or paste the text) of the teacher's study guide. Read it and reply with ONE JSON object and nothing else, in exactly this shape:
 

@@ -1,6 +1,12 @@
-# My Kid Has ADHD: Learning Lab
+# My Kid Has ADHD: Quiz Prep (kids see "Wiggle & Win")
 
-An open-source, tap-to-answer practice app that helps kids with ADHD prepare for school tests and learn the skills behind them. Parents add their child's real tests from the teacher's study guide. The kid-facing app is called **Learning Lab**. The project and repo are called **my-kid-has-adhd**.
+An open-source, tap-to-answer practice app that helps kids with ADHD prepare for school tests and learn the skills behind them. Parents add their child's real tests from the teacher's study guide. The project and repo are called **my-kid-has-adhd**.
+
+## Names (decided Oct 26, 2026; renamed from "Learning Lab")
+- **Parent-facing: "My Kid Has ADHD: Quiz Prep"**, used in the README, GitHub description, search/meta description and share-preview tags (`og:*`, `twitter:*` in `index.html`). It must say ADHD and quiz prep so parents find it and get it.
+- **Kid-facing: "Wiggle & Win"**, used in `<title>`, the home-screen icon name, the app header ("Alex's Wiggle & Win") and the AI prompt. **A child never sees "ADHD"** on kid screens. The grown-up screen and the welcome screen (for the grown-up) may mention it.
+- Tone: a game to get through, not a test to ace. Avoid score-pressure words ("ace", "perfect").
+- Trademarks: all three names are claimed by Qianyu Zhao-Serrano (™, see `TRADEMARKS.md`); not registered yet. A web search on Oct 26, 2026 found no existing "Wiggle & Win" app or mark; the closest is The Wiggles' "WIGGLE AND LEARN". Have an attorney check that before filing.
 
 ## Goals, in priority order
 1. **Pass the test.** Practice the exact things on the teacher's study guide (unit packs).

@@ -53,7 +53,7 @@ function unitSummary(u){const n=(k,one,many)=>{const c=(u[k]||[]).length;return 
 /* ---- the AI prompt (also written to PROMPT.md) ---- */
 function aiPrompt(){
   const skills=Object.entries(SKILLS).filter(([id,s])=>!s.unitOnly&&!SUBJECTS[s.sub].lang).map(([id,s])=>`  - ${id}: ${s.name} (${SUBJECTS[s.sub].name})`).join('\n');
-  return `You are helping a parent turn their child's school study guide into practice for a free kids' learning app called Learning Lab. The child may have ADHD and may be a young or early reader, so everything is read aloud and answered by tapping a picture.
+  return `You are helping a parent turn their child's school study guide into practice for a free kids' learning app called Wiggle & Win (My Kid Has ADHD: Quiz Prep). The child may have ADHD and may be a young or early reader, so everything is read aloud and answered by tapping a picture.
 
 I will attach a photo (or paste the text) of the teacher's study guide. Read it and reply with ONE JSON object and nothing else, in exactly this shape:
 

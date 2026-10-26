@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping! Learning Lab is a static site: plain JavaScript, loaded with `<script>` tags in order, with no build step, backend or framework. Keep it that way, so it stays free to host and never collects children's data. It must also work when `index.html` is opened straight from disk, so never `fetch()` local files.
+Thanks for helping! My Kid Has ADHD: Quiz Prep (the app kids see is called Wiggle & Win) is a static site: plain JavaScript, loaded with `<script>` tags in order, with no build step, backend or framework. Keep it that way, so it stays free to host and never collects children's data. It must also work when `index.html` is opened straight from disk, so never `fetch()` local files.
 
 Run it locally by opening `index.html`, or with any static server, for example `python3 -m http.server`.
 

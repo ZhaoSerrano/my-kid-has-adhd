@@ -1,10 +1,12 @@
-# My Kid Has ADHD: Learning Lab
+# My Kid Has ADHD™: Quiz Prep
 
-**Free, tap-to-answer test practice built from your kid's actual study guide. Designed for kids with ADHD.**
+**Turn quiz prep into a game. Free, tap-to-answer practice built from your kid's actual study guide. Designed for kids with ADHD.**
 
 👉 **Open the app:** https://zhaoserrano.github.io/my-kid-has-adhd/
 
-Learning Lab started with one kindergarten study guide: "How can I help my child prepare for the Unit 3 Reading test?" It grew into practice that fits how many kids learn best:
+Inside the app, your child sees **Wiggle & Win™**, a name that's all about play and never mentions ADHD.
+
+It started with one kindergarten study guide: "How can I help my child prepare for the Unit 3 Reading test?" It grew into practice that fits how many kids learn best:
 
 - **Built from your kid's real homework.** Snap the teacher's study guide, and an AI turns it into a practice test.
 - **Tap-only answers, everything read aloud.** It works for kids who aren't reading yet or don't talk much. Tapping is just like circling on the test.
@@ -15,7 +17,7 @@ Learning Lab started with one kindergarten study guide: "How can I help my child
 
 ## Built around a finish line
 
-This isn't open-ended "study time." Kids with ADHD do best with a clear goal, a clear start and a clear stop, so Learning Lab is built around the real test coming home from school:
+This isn't open-ended "study time." Kids with ADHD do best with a clear goal, a clear start and a clear stop, so the app is built around the real test coming home from school:
 
 - **A real goal.** Your kid's study guide becomes a practice test, with a countdown on the home screen: "Test in 3 days."
 - **A clear start and stop.** Each round is 3 to 5 minutes. Progress dots show how many questions are left, and stars mark the finish.
@@ -32,8 +34,8 @@ This isn't open-ended "study time." Kids with ADHD do best with a clear goal, a 
 ## Add your kid's test in 3 steps
 
 1. **Take a photo** of the teacher's study guide.
-2. In Learning Lab, go to **For grown-ups → Tests → + Add a test**, tap **Copy the AI prompt**, and paste it into Claude, ChatGPT or Gemini along with the photo. (The prompt is also in [PROMPT.md](PROMPT.md).)
-3. **Copy the AI's whole answer** and paste it back into Learning Lab. It checks the answer, shows what it found ("10 words, 5 letters, 4 stories"), and puts the test on the home screen with a countdown to test day.
+2. In the app, go to **For grown-ups → Tests → + Add a test**, tap **Copy the AI prompt**, and paste it into Claude, ChatGPT or Gemini along with the photo. (The prompt is also in [PROMPT.md](PROMPT.md).)
+3. **Copy the AI's whole answer** and paste it back into the app. It checks the answer, shows what it found ("10 words, 5 letters, 4 stories"), and puts the test on the home screen with a countdown to test day.
 
 Each test gets Word cards, a Words quiz, Letter sounds, Stories, the teacher's own questions, and a Practice test, depending on what the study guide covers.
 
@@ -47,7 +49,7 @@ Each test gets Word cards, a Words quiz, Letter sounds, Stories, the teacher's o
 
 ## What it is, and what it isn't
 
-Learning Lab is **designed for kids with ADHD** and for any kid who struggles to sit through worksheets. It is practice, not therapy. It does **not** treat ADHD or any condition, and it doesn't replace teachers, IEP or 504 plans, speech therapy, or medical advice.
+My Kid Has ADHD: Quiz Prep is **designed for kids with ADHD** and for any kid who struggles to sit through worksheets. It is practice, not therapy. It does **not** treat ADHD or any condition, and it doesn't replace teachers, IEP or 504 plans, speech therapy, or medical advice.
 
 ## Why it works this way
 
@@ -68,3 +70,5 @@ It's a static site: plain HTML, CSS and JavaScript, with no build step and no ba
 ## License
 
 Copyright © 2026 Qianyu Zhao-Serrano. Code: [MIT](LICENSE). Content (questions, stories, explanations, word lists): [CC BY 4.0](LICENSE-CONTENT.md). The optional natural voice uses [kokoro-js](https://github.com/hexgrad/kokoro) and the Kokoro-82M model, both Apache 2.0, loaded from a CDN, not bundled here.
+
+"My Kid Has ADHD", "My Kid Has ADHD: Quiz Prep" and "Wiggle & Win" are trademarks of Qianyu Zhao-Serrano. The open-source licenses don't cover the names, so forks need their own name. See [TRADEMARKS.md](TRADEMARKS.md).

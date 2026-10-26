@@ -15,7 +15,7 @@ function welcome(){
   setHeader(PROFILES.length?'Add a child':'Welcome!',PROFILES.length?picker:null);
   view.innerHTML=`<div class="col"><div class="panel">
     <h1>Hi, grown-up!</h1>
-    <p class="small" style="font-size:1rem">Learning Lab is tap-to-answer practice. Everything is read aloud, and your child answers by tapping. Progress stays on this device. Nothing is sent anywhere.</p>
+    <p class="small" style="font-size:1rem"><b>Wiggle &amp; Win™</b> turns quiz prep into a game. Everything is read aloud, and your child answers by tapping. Progress stays on this device. Nothing is sent anywhere.</p>
     <label class="field"><span>Child's first name or nickname <i>(optional)</i></span><input id="nm" maxlength="30" autocomplete="off" autocapitalize="words" spellcheck="false"></label>
     <div class="btnrow left"><button class="primary" id="go1">Next →</button></div>
     <p class="small">Next, hand the device to your child to pick what they like best.</p>
@@ -44,7 +44,7 @@ function picker(){
 }
 
 function home(){
-  const nm=kidName();setHeader(nm?`${nm}'s Learning Lab`:'Learning Lab',PROFILES.length>1?picker:null);
+  const nm=kidName();setHeader(nm?`${nm}'s Wiggle & Win`:'Wiggle & Win',PROFILES.length>1?picker:null);
   const units=visibleUnits();
   const tiles=g=>Object.entries(SUBJECTS).filter(([,s])=>s.group===g).map(([k,s])=>`<button class="subj" style="--h:${s.h}" data-s="${k}"><span class="pic">${s.pic}</span><b>${s.name}</b></button>`).join('');
   view.innerHTML=`<div class="col">
@@ -335,7 +335,7 @@ function grown(){
       <p class="small">Did it help on a test? Did your child choose to play? What should change? Your answers decide what we build next.</p>
       <div class="btnrow left"><a class="primary" href="${FEEDBACK_URL}" target="_blank" rel="noopener">Give feedback</a></div>
       <p class="small">Opens a short form on GitHub (a free account is needed). The form is public, so leave out your child's name and other private details.</p></div>
-    <p class="small"><b>Privacy:</b> names, progress and tests are saved only in this browser on this device. Nothing is sent anywhere. Learning Lab is designed for kids with ADHD; it is practice, not a treatment.</p>
+    <p class="small"><b>Privacy:</b> names, progress and tests are saved only in this browser on this device. Nothing is sent anywhere. Wiggle &amp; Win™ (My Kid Has ADHD™: Quiz Prep) is designed for kids with ADHD; it is practice, not a treatment.</p>
     <button class="secondary" id="reset" style="align-self:center">Reset ${esc(kidLabel(me,idx))}'s progress</button>
   </div>`;
   $('#kidName').onchange=e=>{me.name=e.target.value.trim().slice(0,30);saveProfiles()};

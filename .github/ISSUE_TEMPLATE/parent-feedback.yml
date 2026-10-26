@@ -1,12 +1,12 @@
 name: Parent feedback
-description: Tell us how Learning Lab worked for your child. No coding needed; it takes about 2 minutes.
+description: Tell us how Wiggle & Win worked for your child. No coding needed; it takes about 2 minutes.
 title: "Parent feedback"
 labels: ["feedback"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for trying Learning Lab! 💛
+        Thank you for trying Wiggle & Win (My Kid Has ADHD: Quiz Prep)! 💛
 
         **This page is public.** Please leave out your child's name, school, photos, diagnosis details or anything else private.
   - type: dropdown

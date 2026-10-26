@@ -8,7 +8,7 @@ The **educational content** is licensed under the [Creative Commons Attribution 
 
 You may share and adapt the content for any purpose, including commercially, as long as you give credit, for example:
 
-> Content from [My Kid Has ADHD: Learning Lab](https://github.com/ZhaoSerrano/my-kid-has-adhd) by Qianyu Zhao-Serrano, CC BY 4.0.
+> Content from [My Kid Has ADHD: Quiz Prep](https://github.com/ZhaoSerrano/my-kid-has-adhd) by Qianyu Zhao-Serrano, CC BY 4.0.
 
 Tests that parents add in the app stay on their own device and aren't part of this repository.
 
