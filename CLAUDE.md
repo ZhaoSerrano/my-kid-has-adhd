@@ -73,7 +73,8 @@ Optional question fields: `whyText` (screen text when it differs from the spoken
 - Mastery per skill (last 10 tries). "Play a mix" weights toward weak skills.
 - Child's name removed from the code.
 - **v1 tasks 1–8 done (Oct 26, 2026).** Profiles and theme picker; explanation panel with Next; rewritten `why`s; in-round retries and item boxes; themes in math, patterns and robot/debug; Add-a-test flow (`aiPrompt`, `parseUnit`, `unitSections`, `unitTest` in `js/units.js`); wiggle breaks; Common Core/NGSS codes (`cc` on `SKILLS`); README, PROMPT, LICENSE, CONTRIBUTING. Tested in the browser: ~11k generated questions, every subject mix, unit tests, and the grown-up screens with zero page errors, at 390×844 and 820×1180 in light and dark.
-- **Next:** task 9 (deploy) needs the founder's go-ahead. Licenses are proposed, not yet confirmed (see the private STORY.md).
+- Licenses confirmed by the founder (Oct 26, 2026): MIT for code, CC BY 4.0 for content.
+- **Next:** task 9 (deploy) was approved Oct 26, 2026: push `main` to `github.com/ZhaoSerrano/my-kid-has-adhd`, then turn on GitHub Pages (main branch, root).
 
 ### v1 tasks (done except 9; kept for reference)
 1. **Profiles.**
