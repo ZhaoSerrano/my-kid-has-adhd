@@ -81,6 +81,12 @@ The founder's rule: **if there's a test, focus only on the test.** Otherwise kid
 - End of a round: big button = next stop / "Try something new"; "Play again" is small. End of the day: recap ("Today you practiced…") + a theme sticker + "See you tomorrow".
 - Based on: Khan Academy Kids (one Play button into a path), Duolingo ABC (linear path), ADHD guidance (one step at a time, immediate rewards), spaced-retrieval research, Reading Eggs/Bitsboard end-of-session rewards.
 
+### Teacher voice (Oct 26, 2026)
+- The founder wants the voice to sound like an excited, warm teacher (she pointed to how kids' educators like Ms Rachel and Blippi talk). Borrow *techniques* only, never their voices, names or catchphrases.
+- `STYLE` + `styleOf()` in `js/core.js`: lines ending in "?" = ask (slower, rise), "!" = cheer (brighter), 1–2 words = key word (slowest, lifted), else say (slightly slow). Device voice uses rate and pitch; the natural voice uses speed only (`nvSpeed`, part of `nvKey`). 250 ms beat between lines.
+- `TALK` in `js/app.js`: varied, effort-based praise ("great listening", "you kept trying"), streak praise, kind retry and miss lines, and a round opener. `talk()` never repeats the last line. Keep new kid-facing lines here so the natural voice warms them up.
+- Sources: child-directed speech (Shi et al. 2023), speaking rate and comprehension (Berry & Erickson), SLP pausing guidance, process praise (Gunderson et al. 2013).
+
 ### Speech gotchas (learned the hard way, Oct 26, 2026)
 - Browsers block speech until a tap. The app opens on a "▶ Let's play!" splash; `unlockAudio()` runs on the first tap and replays anything said before it.
 - iPad Safari needs the first speech *inside* the tap: `unlockAudio` speaks an empty, silent line on iOS only.

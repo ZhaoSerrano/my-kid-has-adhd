@@ -18,6 +18,7 @@ A new, guided way to play, based on what works in apps like Khan Academy Kids an
 - **Always a clear next step.** After a round, the big button says *"Next: Something new →"* or *"Try something new"*. "Play again" is now a small, secondary choice.
 - **A recap and a sticker at the end of the day.** "Today you practiced…", a sticker from your child's favorite things, and "See you tomorrow!" Stickers collect on the home screen.
 - **Fewer choices on the home screen:** 3 buttons instead of about 15. All subjects are still there under **Choose a game**.
+- **A warmer "teacher voice."** Based on how good teachers and speech therapists talk to young children: a little slower overall, questions with a lively rise, **key words said slowly and clearly** (like *burrow* or *sss*), bright praise, and a short pause between sentences. Praise is varied and about effort ("Wow! Great listening!", "You kept trying, and you got it!", "You're on a roll!"), and misses are kind ("Hmm, almost!", "That's okay! Let's learn it together.").
 - **Voice fixes.** The app opens with a big "▶ Let's play!" button, because browsers (especially on iPad and iPhone) stay silent until the first tap. If the device voice gets stuck, the app resets it and tries again. **For grown-ups → Voice** now shows whether the voice is working.
 
 ## 1.5.1 — Oct 26, 2026

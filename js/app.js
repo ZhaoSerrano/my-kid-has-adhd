@@ -140,7 +140,21 @@ function deck(title,items,i,back){
 let R=null,roundsDone=0;
 const MAX_EXTRAS=2;
 // opts.stop: index of today's adventure stop this round belongs to (absent for games picked by hand)
-function runRound(title,make,back,opts={}){hush();R={title,make,back,opts,qs:make(),i:0,res:[],extras:0};R.qs.forEach(q=>nvPrefetch(q.prompt));showQ()}
+function runRound(title,make,back,opts={}){hush();R={title,make,back,opts,qs:make(),i:0,res:[],extras:0,streak:0};
+  // an inviting start, like a teacher: "Ready? Here we go!"
+  if(R.qs[0]&&!R.qs[0].mode)R.qs[0]=Object.assign({},R.qs[0],{prompt:[talk('start'),500,...R.qs[0].prompt]});
+  R.qs.forEach(q=>nvPrefetch(q.prompt));showQ()}
+/* What the app says, teacher-style: praise the effort and the listening (not "you're smart"), vary it so it never
+   sounds like a machine, and keep misses kind. Every line here is also prepared ahead by the natural voice (nvWarm). */
+const TALK={
+  start:['Ready? Here we go!',"Ooh, let's find out!",'Here comes the first one!'],
+  first:['Yes! You got it!','Wow! Great listening!','You did it! High five!','Yes! You thought hard about that!','Yay! Nice work!'],
+  streak:["Whoa! You're on a roll!",'Another one! You are working so hard!'],
+  second:['Yes! You kept trying, and you got it!',"That's it! Trying again really works!"],
+  retry:['Hmm, almost!','Ooh, so close!'],
+  miss:["That's okay! Let's learn it together."]};
+// a line from TALK, never the same one twice in a row
+let lastTalk='';const talk=k=>{const pool=TALK[k].filter(x=>x!==lastTalk);return lastTalk=one(pool.length?pool:TALK[k])};
 // A missed question comes back once at the end of the round, reshuffled (at most MAX_EXTRAS per round).
 function requeue(q){if(q.again||q.mode==='robot'||R.extras>=MAX_EXTRAS)return;R.extras++;
   R.qs.push(Object.assign({},q,{again:true,key:q.key+'#again',options:q.options&&shuffle(q.options),prompt:["Let's try this one again.",500,...q.prompt]}))}
@@ -156,11 +170,12 @@ function showQ(){
     win(first){if(ended)return;ended=true;R.res[R.i]=first;
       if(q.again)record(null,false,first);else{record(q.skill,first);markItem(q,first)}
       const s=$('.stars');s.classList.remove('pop');void s.offsetWidth;if(first)s.classList.add('pop');
-      fb(first?'Yes! ⭐':'Yes, you got it!','good');say(first?'Yes! Great job!':'Yes! You got it!',()=>setTimeout(go,700))},
+      R.streak=first?R.streak+1:0;const line=talk(!first?'second':R.streak>=3&&R.streak%3===0?'streak':'first');
+      fb(first?`${line} ⭐`:line,'good');say(line,()=>setTimeout(go,700))},
     // Wrong twice: show the right answer and why, read it aloud, and wait for Next.
     lose(){if(ended)return;ended=true;R.res[R.i]=false;
       if(!q.again){record(q.skill,false);markItem(q,false)}requeue(q);
-      const w=q.why&&q.why.length?q.why:['Here is the answer.'];fb('','');
+      R.streak=0;const w=[talk('miss'),500,...(q.why&&q.why.length?q.why:['Here is the answer.'])];fb('','');
       st.insertAdjacentHTML('beforeend',`<div class="why" role="status"><span class="ck" aria-hidden="true">✓</span><p>${esc(whyText(q)||'Here is the answer.')}</p>
         <button class="listen icon" id="whyHear" aria-label="hear why again">${SPK}</button></div>
         <button class="primary nextbtn" id="nextBtn">Next →</button>`);
@@ -168,7 +183,7 @@ function showQ(){
       st.querySelector('#nextBtn').onclick=()=>{hush();go()};
       st.querySelector('#nextBtn').scrollIntoView({block:'nearest',behavior:'smooth'});
       say(w)},
-    retry(){fb('Hmm, listen one more time.','try');say(['Hmm.',300,'Try again.',800,...q.prompt])},
+    retry(){const r=talk('retry');fb(`${r} Listen one more time.`,'try');say([r,300,'Listen one more time.',800,...q.prompt])},
     fb,
   };
   (MOUNTS[q.mode||'choose'])(q,st,api);
@@ -193,13 +208,14 @@ function done(){
     else{const id=suggestNew(skills[0]);if(id){label=`Try something new: ${SKILLS[id].kid}`;next=()=>runRound(SKILLS[id].kid,()=>makeSet(Array(SKILLS[id].n||5).fill(id),{}),pickGame)}}}
   const wig=roundsDone%2===0?one(WIGGLES):null;
   const cheer=got===n?'Wow! All the stars!':got>=n/2?'You did great!':'Good effort! You are learning.';
+  const cheerSay=got===n?['Wow! All the stars!',300,'You listened so carefully!']:got>=n/2?['You did great!',300,'All that practice is paying off!']:['Good effort!',300,'You are learning, and that is what counts!'];
   view.innerHTML=`<div class="col"><div class="stage done"><h1>${cheer}</h1>
     <div class="row">${R.res.map(r=>STAR.replace('<svg',`<svg class="${r?'':'off'}"`)).join('')}</div>
     ${wig?`<div class="wiggle" id="wig"><div class="bigpic">${wig[0]}</div><h2>Wiggle break!</h2><p>${wig[1]}</p><button class="go" id="did">I did it!</button></div>`:''}
     ${next?`<button class="playbig" id="next">${esc(label)} →</button>`:`<button class="playbig" id="next">Done ✓</button>`}
     <div class="btnrow"><button class="secondary sm" id="again">↻ Play again</button>${R.opts.stop!=null||!next?'':`<button class="secondary sm" id="back2">Done</button>`}</div></div></div>`;
   const forward=next?(label.startsWith('Next')?[label+'!']:['Want to try something new?',300,'Tap the big button.']):[];
-  say(wig?[cheer,600,'Wiggle break!',400,wig[1]]:[cheer,500,...forward]);
+  say(wig?[...cheerSay,600,'Wiggle break!',400,wig[1]]:[...cheerSay,500,...forward]);
   if(wig)$('#did').onclick=()=>{$('#wig').innerHTML='<div class="bigpic">🎉</div><h2>Great moving!</h2>';say(['Great moving!',400,...forward])};
   $('#next').onclick=()=>{hush();(next||R.back)()};
   $('#again').onclick=()=>runRound(R.title,R.make,R.back,R.opts);

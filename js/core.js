@@ -105,7 +105,15 @@ function nvLoad(){if(NV.state==='loading'||NV.state==='ready')return;nvSet('load
       else if(m.type==='error'){const p=nvWait.get(m.id);if(p){nvWait.delete(m.id);p.rej(new Error(m.msg))}else fail(m.msg)}};
     w.postMessage({type:'load',lib:NV_LIB,model:NV_MODEL})}
   catch(e){fail(e)}}
-const nvKey=t=>`${pref.nvoice}|${pref.rate}|${t}`;
+/* Teacher voice: how warm, excited teachers and speech therapists talk to young children.
+   Questions get a lively rise and a slower pace, key words (one or two words: "burrow", "sss") are said slower with a lift,
+   praise is quicker and brighter, everything else is a touch slower than adult speech. Picked from punctuation and length,
+   so content stays plain text. The natural voice can only change speed, so it gets the speeds (its "!" carries the excitement). */
+const STYLE={say:{rate:.95,pitch:1.05},ask:{rate:.9,pitch:1.15},word:{rate:.78,pitch:1.18},cheer:{rate:1.06,pitch:1.3}};
+function styleOf(t){const s=String(t).trim();if(/!$/.test(s))return 'cheer';if(/\?$/.test(s))return 'ask';
+  if(s.split(/\s+/).length<=2&&s.length<=14)return 'word';return 'say'}
+const nvSpeed=t=>+(pref.rate*STYLE[styleOf(t)].rate).toFixed(2);
+const nvKey=t=>`${pref.nvoice}|${nvSpeed(t)}|${t}`;
 /* Generated lines are kept on the device (IndexedDB, newest NV_KEEP lines), so a line heard once plays instantly after that. */
 const NV_KEEP=800;
 const nvDB=(()=>{let p=null;return ()=>p||(p=new Promise(res=>{try{const r=indexedDB.open('mkha-voice',1);
@@ -117,7 +125,7 @@ function nvSaveClip(k,d){const i=new Int16Array(d.data.length);for(let n=0;n<i.l
   while(keys.length>NV_KEEP){const old=keys.shift();nvReq('readwrite',s=>s.delete(old))}store.set('mkha_nv_keys',keys)}
 /* One synthesis at a time, by priority: 0 = about to be spoken, 1 = coming up soon (this round), 2 = idle warm-up. */
 function nvAudio(text,lv=1){const k=nvKey(text);let j=NV.cache.get(k);
-  if(!j){j={k,text,voice:pref.nvoice,speed:pref.rate,lv:9};j.p=new Promise((res,rej)=>{j.res=res;j.rej=rej});j.p.catch(()=>NV.cache.delete(k));NV.cache.set(k,j);
+  if(!j){j={k,text,voice:pref.nvoice,speed:nvSpeed(text),lv:9};j.p=new Promise((res,rej)=>{j.res=res;j.rej=rej});j.p.catch(()=>NV.cache.delete(k));NV.cache.set(k,j);
     if(NV.cache.size>150)for(const [kk,jj] of NV.cache)if(jj.settled){NV.cache.delete(kk);break}}
   if(!j.settled&&lv<j.lv){j.lv=lv;if(!j.running){NV.queue=NV.queue.filter(x=>x!==j);NV.idle=NV.idle.filter(x=>x!==j);
     lv===0?NV.queue.unshift(j):lv===1?NV.queue.push(j):NV.idle.push(j);nvPump()}}
@@ -138,7 +146,8 @@ const nvText=parts=>(Array.isArray(parts)?parts:[parts]).filter(p=>typeof p==='s
 function nvPrefetch(parts,lv=1){if(nvOn())nvText(parts).forEach(t=>nvAudio(t,lv))}
 // In idle time, get ahead on what this child will hear most: feedback, their tests, and letter sounds.
 function nvWarm(){if(!nvOn()||!P)return;const L=[],add=p=>L.push(...nvText(p));
-  add(['Yes! Great job!','Yes! You got it!','Hmm.','Try again.',"Let's try this one again.",'Wow! All the stars! Great job.','Wiggle break!','Great moving! Your body is ready to learn.']);
+  if(typeof TALK!=='undefined')Object.values(TALK).forEach(add);
+  add(['Listen one more time.',"Let's try this one again.",'Wow! All the stars!','You listened so carefully!','You did great!','All that practice is paying off!','Wiggle break!','Great moving!']);
   visibleUnits().forEach(u=>{
     (u.words||[]).forEach(w=>add([w.word+'.',...sentences(w.meaning),...sentences(w.good),...sentences(w.silly),`Is the word ${w.word} used the right way?`]));
     if((u.words||[]).length)add(['Happy face for yes.','Sad face for no.','Sad face.','Happy face!','Here is a sentence that makes sense.']);
@@ -177,7 +186,7 @@ function say(parts,done){
     const p=list[i++];if(typeof p==='number'){setTimeout(step,p);return}
     if(typeof p==='function'){let ms=0;try{ms=p()||0}catch(e){}setTimeout(step,ms);return}
     const txt=typeof p==='object'?p.t:p,lang=typeof p==='object'?p.lang:null;
-    speakOne(txt,()=>{if(id===sayId)setTimeout(step,120)},lang,nat)};
+    speakOne(txt,()=>{if(id===sayId)setTimeout(step,250)},lang,nat)};   // a teacher's beat between sentences
   // A child never waits for the natural voice: it reads only when every line is already made.
   // Otherwise the device voice reads now, and the natural voice gets these lines ready for next time.
   const lines=nvOn()?nvText(list):[];
@@ -201,7 +210,7 @@ function speakOne(text,cb,lang,nat){
 const voiceHealth={ok:0,stuck:0,last:''};
 function deviceSpeak(text,cb,lang,retry){
   if(!synth){cb();return}
-  try{const u=new SpeechSynthesisUtterance(text),v=lang?voiceFor(lang):voice;u.rate=pref.rate*(lang?.85:1);u.pitch=1;
+  try{const u=new SpeechSynthesisUtterance(text),v=lang?voiceFor(lang):voice;const st=lang?STYLE.say:STYLE[styleOf(text)];u.rate=pref.rate*st.rate*(lang?.85:1);u.pitch=st.pitch;
     if(v){u.voice=v;u.lang=v.lang}else u.lang=lang==='zh'?'zh-CN':lang==='es'?'es-MX':'en-US';
     let fired=false,started=false;const fin=()=>{if(!fired){fired=true;clearTimeout(t);clearTimeout(kick);cb()}};
     u.onstart=()=>{started=true;voiceHealth.ok++;voiceHealth.last='ok'};u.onend=fin;u.onerror=fin;
