@@ -416,16 +416,23 @@ function grown(){
     <div class="panel"><h2>Light or dark</h2><div class="seg" id="look">${[['auto','Auto'],['light','☀️ Light'],['dark','🌙 Dark']].map(([k,t])=>`<button data-a="${k}" class="${appearance()===k?'on':''}" aria-pressed="${appearance()===k}">${t}</button>`).join('')}</div>
       <p class="small">Auto follows this device's setting. The choice is saved on this device for every child.</p></div>
     <div class="panel"><h2>Voice</h2>
-      <label class="switch"><input type="checkbox" id="nvOn" ${pref.natural?'checked':''}><span><b>Natural voice</b> <span class="tag">beta</span></span></label>
-      <p class="small">A free, open-source AI voice that sounds much more like a person. It downloads once (about 100 MB, so use Wi-Fi), then runs on this device. The words it reads never leave the device. English only.</p>
+      <p class="small">Which voice reads to your child?</p>
+      <div class="voicepick" id="vpick">
+        <button data-v="device" class="${pref.natural?'':'on'}" aria-pressed="${!pref.natural}"><span>🔊</span><b>Phone or tablet voice</b><small>Built in. Starts instantly.</small></button>
+        <button data-v="natural" class="${pref.natural?'on':''}" aria-pressed="${pref.natural}"><span>✨</span><b>Natural voice</b><small>Sounds more like a person. One-time download (about 100 MB, use Wi-Fi).</small></button></div>
       <div class="vrow" id="nvRow"><label for="nvSel">Natural voice</label><select id="nvSel">${NV_VOICES.map(([id,nm])=>`<option value="${id}" ${pref.nvoice===id?'selected':''}>${nm}</option>`).join('')}</select></div>
       <p class="small" id="nvStatus" aria-live="polite"></p>
-      <div class="vrow"><label for="voiceSel">Device voice</label><select id="voiceSel"></select></div>
-      <p class="small" id="voiceCheck" aria-live="polite"></p>
-      <div class="vrow"><label for="rate">Speed</label><input type="range" id="rate" min="0.7" max="1.1" step="0.05"><span id="rateVal" style="min-width:3.2em;font-variant-numeric:tabular-nums"></span></div>
-      <div class="btnrow" style="justify-content:flex-start"><button class="secondary" id="testVoice">Test English</button><button class="secondary" id="testZh">Test 中文</button><button class="secondary" id="testEs">Test Español</button></div>
-      <p class="small">Chinese voice: <b>${vz?esc(vz.name):'none on this device'}</b>. Spanish voice: <b>${ve?esc(ve.name):'none on this device'}</b>.</p>
-      <p class="small">On iPhone or iPad, add better voices in Settings › Accessibility › Spoken Content › Voices. Pick English (Ava or Zoe Premium), Chinese, and Spanish, download them, then reopen this page.</p></div>
+      <div class="btnrow left"><button class="primary" id="testVoice">▶ Hear a sample</button></div>
+      <p class="small" id="sampleStatus" aria-live="polite"></p>
+      <details class="more"><summary class="small"><b>More voice settings</b></summary>
+        <div class="col" style="gap:12px;margin-top:12px">
+        <div class="vrow"><label for="voiceSel">Phone or tablet voice</label><select id="voiceSel"></select></div>
+        <p class="small" id="voiceCheck" aria-live="polite"></p>
+        <div class="vrow"><label for="rate">Speed</label><input type="range" id="rate" min="0.7" max="1.1" step="0.05"><span id="rateVal" style="min-width:3.2em;font-variant-numeric:tabular-nums"></span></div>
+        <div class="btnrow left"><button class="secondary sm" id="testZh">Test 中文</button><button class="secondary sm" id="testEs">Test Español</button></div>
+        <p class="small">Chinese voice: <b>${vz?esc(vz.name):'none on this device'}</b>. Spanish voice: <b>${ve?esc(ve.name):'none on this device'}</b>. Chinese and Spanish always use the phone or tablet voice.</p>
+        <p class="small">On iPhone or iPad, better built-in voices are in Settings › Accessibility › Spoken Content › Voices. Download English (Ava or Zoe Premium), Chinese and Spanish, then reopen this page.</p>
+        <p class="small">The natural voice is a free, open-source AI voice (Kokoro) that runs on this device. The words it reads never leave the device. While it's still preparing a line, the phone or tablet voice reads it, so your child never waits.</p></div></details></div>
     <div class="panel"><h2>Tell us how it went</h2>
       <p class="small">Did it help on a test? Did your child choose to play? What should change? Your answers decide what we build next.</p>
       <div class="btnrow left"><a class="primary" href="${FEEDBACK_URL}" target="_blank" rel="noopener">Give feedback</a></div>
@@ -460,21 +467,30 @@ function grown(){
   $('#voiceSel').onchange=e=>{pref.name=e.target.value;voice=voices.find(v=>v.name===pref.name)||voice;savePref();testV()};
   const r=$('#rate');r.value=pref.rate;$('#rateVal').textContent=pref.rate.toFixed(2)+'×';
   r.oninput=()=>{pref.rate=+r.value;$('#rateVal').textContent=pref.rate.toFixed(2)+'×';savePref()};
-  const SAMPLE=['Hi!',400,'The rabbit dug a burrow under the ground.',900,'Is the word burrow used the right way?',900,'What letter makes this sound?',700,'sss',600,'sss',800,'Like sun.'];
-  // the sample always waits for the natural voice, so a grown-up hears the real thing
-  const testV=()=>{if(!nvOn()){say(SAMPLE);return}const s=$('#nvStatus');s.textContent='Getting the sample ready… (a few seconds the first time)';
-    Promise.all(nvText(SAMPLE).map(t=>nvAudio(t,0))).then(()=>{nvShow();say(SAMPLE)},()=>{nvShow();say(SAMPLE)})};
+  // A short sample, two lines, in the teacher voice: a question and a cheer.
+  const SAMPLE=['Hi! Which one rhymes with cat?',700,'Wow! Great listening!'];
+  // With the natural voice, the sample waits until its lines are made (showing progress), so a grown-up hears the real thing.
+  const testV=()=>{const st=$('#sampleStatus');
+    if(!nvOn()){st.textContent=pref.natural&&NV.state==='loading'?'The natural voice is still downloading, so this is the phone or tablet voice.':'';say(SAMPLE);setTimeout(vcShow,4000);return}
+    const lines=nvText(SAMPLE),t0=Date.now();let made=0;st.textContent=`Preparing the natural voice… 0 of ${lines.length}`;
+    lines.forEach(t=>nvAudio(t,0).then(()=>{made++;if(made<lines.length)st.textContent=`Preparing the natural voice… ${made} of ${lines.length}`},()=>{}));
+    Promise.all(lines.map(t=>nvAudio(t,0))).then(()=>{const sec=Math.round((Date.now()-t0)/1000);
+      st.textContent=sec>=3?`This device took ${sec} seconds to prepare the sample. During play, a line that isn't ready yet is read by the phone or tablet voice, so your child never waits.`:'';say(SAMPLE)},
+      ()=>{st.textContent="The natural voice couldn't prepare the sample, so this is the phone or tablet voice.";say(SAMPLE)})};
   const nvShow=()=>{const s=$('#nvStatus');if(!s)return;$('#nvRow').hidden=!pref.natural;
-    s.textContent=!pref.natural?'':NV.state==='loading'?`Downloading the natural voice… ${NV.pct}%`:NV.state==='ready'?'Natural voice is ready. Tap “Test English” to hear it.'
-      :NV.state==='failed'?"The natural voice couldn't load on this device, so the device voice is used. Check the internet connection and try again."
-      :nvCrashed()?"Last time the natural voice didn't finish loading, so it wasn't started automatically. Turn it off and on to try again.":''};
+    s.textContent=!pref.natural?'':NV.state==='loading'?`Downloading the natural voice… ${NV.pct}%`:NV.state==='ready'?'✓ The natural voice is ready.'
+      :NV.state==='failed'?"The natural voice couldn't load on this device, so the phone or tablet voice is used. Check the internet connection and try again."
+      :nvCrashed()?"Last time the natural voice didn't finish loading. Tap Natural voice again to retry.":''};
   NV.onchange=nvShow;nvShow();
   // Is the device voice really talking in this browser? Tells a grown-up what to do when it isn't.
   const vcShow=()=>{const e=$('#voiceCheck');if(!e)return;
-    e.innerHTML=voiceHealth.last==='stuck'?"⚠️ <b>The device voice isn't responding in this browser.</b> Quit the browser completely and reopen it, or turn on <b>Natural voice</b> above, which plays a different way."
-      :voiceHealth.ok?'✓ The device voice is working.':'Tap <b>Test English</b> to check the voice.'};
-  vcShow();$('#testVoice').addEventListener('click',()=>setTimeout(vcShow,4000));
-  $('#nvOn').onchange=e=>{pref.natural=e.target.checked;savePref();if(pref.natural){store.del('mkha_nv_trying');if(NV.state==='failed')NV.state='off';nvLoad();nvWarm();nvPump()}else nvStop();nvShow()};
+    e.innerHTML=voiceHealth.last==='stuck'?"⚠️ <b>The phone or tablet voice isn't responding in this browser.</b> Quit the browser completely and reopen it, or choose <b>Natural voice</b> above, which plays a different way."
+      :voiceHealth.ok?'✓ The phone or tablet voice is working.':'Tap <b>Hear a sample</b> to check the voice.'};
+  vcShow();
+  // one choice: the phone or tablet voice, or the natural voice
+  $('#vpick').querySelectorAll('button').forEach(b=>b.onclick=()=>{pref.natural=b.dataset.v==='natural';savePref();
+    $('#vpick').querySelectorAll('button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',x===b)});$('#sampleStatus').textContent='';
+    if(pref.natural){store.del('mkha_nv_trying');if(NV.state==='failed')NV.state='off';nvLoad();nvWarm();nvPump()}else nvStop();nvShow()});
   $('#nvSel').onchange=e=>{pref.nvoice=e.target.value;savePref();if(nvOn())testV()};
   $('#testVoice').onclick=testV;
   $('#testZh').onclick=()=>say([{t:'你好！我是熊猫。',lang:'zh'}]);
