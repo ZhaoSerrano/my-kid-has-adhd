@@ -471,7 +471,10 @@ function grown(){
   const SAMPLE=['Hi! Which one rhymes with cat?',700,'Wow! Great listening!'];
   // With the natural voice, the sample waits until its lines are made (showing progress), so a grown-up hears the real thing.
   const testV=()=>{const st=$('#sampleStatus');
-    if(!nvOn()){st.textContent=pref.natural&&NV.state==='loading'?'The natural voice is still downloading, so this is the phone or tablet voice.':'';say(SAMPLE);setTimeout(vcShow,4000);return}
+    // never let the phone voice pass for the natural one: say which voice is playing and why
+    if(!nvOn()){st.textContent=!pref.natural?'':NV.state==='loading'?`The natural voice is still getting ready (${NV.pct}%). Until it's ready, you and your child hear the phone or tablet voice. This is that voice:`
+      :"The natural voice isn't working on this device right now, so you and your child hear the phone or tablet voice. This is that voice:";
+      say(SAMPLE);setTimeout(vcShow,4000);return}
     const lines=nvText(SAMPLE),t0=Date.now();let made=0;st.textContent=`Preparing the natural voice… 0 of ${lines.length}`;
     lines.forEach(t=>nvAudio(t,0).then(()=>{made++;if(made<lines.length)st.textContent=`Preparing the natural voice… ${made} of ${lines.length}`},()=>{}));
     Promise.all(lines.map(t=>nvAudio(t,0))).then(()=>{const sec=Math.round((Date.now()-t0)/1000);
